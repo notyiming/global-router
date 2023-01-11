@@ -1,2 +1,4 @@
 testcase/
+output/
 *.pyc
+.vscode
