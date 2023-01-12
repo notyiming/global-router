@@ -1,0 +1,8 @@
+.login-bg {
+    background-color: rgb(72, 88, 146);
+}
+
+.bg-glass {
+    background-color: hsla(0, 0%, 100%, 0.756) !important;
+    backdrop-filter: saturate(200%) blur(25px);
+}
