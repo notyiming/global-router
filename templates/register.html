@@ -1,14 +1,77 @@
 <!doctype html>
-<title>Global Router Login</title>
+<title>Registration</title>
 {% include "header.html" %}
-<div class="container">
-  <div class="row" style="background-color: blue;">
-    <div class="col-8">
-      1 of 2
-    </div>
-    <div class="col-4" style="background-color: red;">
-      2 of 2
+<!-- Section: Design Block -->
+<section class="overflow-hidden login-bg vh-100">
+  <div class="container px-4 py-5 px-md-5 text-center text-lg-start my-5">
+    <div class="row gx-lg-5 align-items-center mb-5">
+      <div class="col-lg-6 mb-5 mb-lg-0" style="z-index: 10">
+        <h1 class="my-5 display-5 fw-bold ls-tight" style="color: hsl(221, 55%, 88%)">
+          Global Router<br />
+        </h1>
+        <h5>
+          <span style="color: hsl(218, 77%, 83%)">Global Route Paths and Congestion Data Visualizer</span>
+        </h5>
+        <!-- <p class="mb-4 opacity-70" style="color: hsl(220, 42%, 85%)">
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+          Temporibus, expedita iusto veniam atque, magni tempora mollitia
+          dolorum consequatur nulla, neque debitis eos reprehenderit quasi
+          ab ipsum nisi dolorem modi. Quos?
+        </p> -->
+      </div>
+
+      <div class="col-lg-6 mb-5 mb-lg-0 position-relative">
+        <div class="card bg-glass">
+          <div class="card-body px-4 py-5 px-md-5">
+            <form>
+              <h3 class="text-center py-2" style="color:rgb(72, 88, 146)">Register</h3>
+
+              <!-- 2 column grid layout with text inputs for the first and last names -->
+              <div class="row">
+                <div class="col-md-6 mb-4">
+                  <div class="form-floating">
+                    <input type="text" id="fnameInput" class="form-control" placeholder="First Name"/>
+                    <label for="fnameInput">First name</label>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <div class="form-floating">
+                    <input type="text" id="lnameInput" class="form-control" placeholder="Last Name"/>
+                    <label for="lnameInput">Last name</label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Email input -->
+              <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="emailInput" placeholder="name@example.com">
+                <label for="emailInput">Email address</label>
+              </div>
+              <!-- Password input -->
+              <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="passwordInput" placeholder="Password">
+                <label for="passwordInput">Password</label>
+              </div>
+
+              <!-- Submit button -->
+              <button type="submit" class="btn btn-primary btn-block mb-4">
+                Register
+              </button>
+              <p class="small">Already have an account? <a href="/login" class="text-muted">Login here</a></p>
+
+              <!-- Register buttons -->
+              <div class="text-center">
+                <p>or sign up with:</p>
+                <button type="button" class="btn btn-link btn-floating mx-1">
+                  <i class="fab fa-google"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+</section>
+<!-- Section: Design Block -->
 {% include "footer.html" %}
