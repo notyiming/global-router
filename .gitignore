@@ -2,3 +2,4 @@ testcase/
 output/
 *.pyc
 .vscode
+fbconfig.py

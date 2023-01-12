@@ -1,18 +1,8 @@
 from flask import Flask, session, render_template, request, redirect
+from fbconfig import config
 import pyrebase
 
 app = Flask(__name__)
-
-config = {
-    "apiKey": "AIzaSyBLWI2VvmKXXUeFeQlqjDB-0Gcpd1Oj_AQ",
-    "authDomain": "global-router.firebaseapp.com",
-    "projectId": "global-router",
-    "storageBucket": "global-router.appspot.com",
-    "messagingSenderId": "692743036864",
-    "appId": "1:692743036864:web:e5738b41fe4afe26123225",
-    "measurementId": "G-YG6SFLCQ0X",
-    "databaseURL": ""
-}
 
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
@@ -35,17 +25,32 @@ def login():
             return "Failed to Login"
     return render_template("login.html")
 
+@app.route("/resetPassword", methods=["POST", "GET"])
+def reset_password():
+    if request.method == "POST":
+        email = request.form.get("email_to_reset")
+        auth.send_password_reset_email(email)
+        # notify user that password reset link has been sent
+        return redirect("/login")
+    elif request.method == "GET":
+        return render_template("reset_password.html")
+
+
 @app.route("/logout")
 def logout():
     session.pop("user")
     return redirect("/login")
+
 
 @app.route("/register")
 def register():
     app.logger.debug("register request")
     return render_template("register.html")
 
+
 @app.route("/dashboard")
 def dashboard():
+    if not "user" in session:
+        return redirect("/login")
     app.logger.debug("dashboard request")
     return render_template("dashboard.html")
