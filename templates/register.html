@@ -23,20 +23,20 @@
       <div class="col-lg-6 mb-5 mb-lg-0 position-relative">
         <div class="card bg-glass">
           <div class="card-body px-4 py-5 px-md-5">
-            <form>
+            <form action="/register" method="POST">
               <h3 class="text-center py-2" style="color:rgb(72, 88, 146)">Register</h3>
 
               <!-- 2 column grid layout with text inputs for the first and last names -->
               <div class="row">
                 <div class="col-md-6 mb-4">
                   <div class="form-floating">
-                    <input type="text" id="fnameInput" class="form-control" placeholder="First Name"/>
+                    <input type="text" id="fnameInput" name="fname" class="form-control" placeholder="First Name"/>
                     <label for="fnameInput">First name</label>
                   </div>
                 </div>
                 <div class="col-md-6 mb-4">
                   <div class="form-floating">
-                    <input type="text" id="lnameInput" class="form-control" placeholder="Last Name"/>
+                    <input type="text" id="lnameInput" name="lname" class="form-control" placeholder="Last Name"/>
                     <label for="lnameInput">Last name</label>
                   </div>
                 </div>
@@ -44,12 +44,12 @@
 
               <!-- Email input -->
               <div class="form-floating mb-3">
-                <input type="email" class="form-control" id="emailInput" placeholder="name@example.com">
+                <input type="email" class="form-control" name="email" id="emailInput" placeholder="name@example.com">
                 <label for="emailInput">Email address</label>
               </div>
               <!-- Password input -->
               <div class="form-floating mb-3">
-                <input type="password" class="form-control" id="passwordInput" placeholder="Password">
+                <input type="password" class="form-control" name="password" id="passwordInput" placeholder="Password">
                 <label for="passwordInput">Password</label>
               </div>
 

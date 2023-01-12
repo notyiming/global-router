@@ -9,6 +9,7 @@ auth = firebase.auth()
 
 app.secret_key = "ming"
 
+
 @app.route("/")
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -19,11 +20,16 @@ def login():
         password = request.form.get("password")
         try:
             user = auth.sign_in_with_email_and_password(email, password)
-            session["user"] = email
-            return redirect("/dashboard")
+            if auth.get_account_info(user["idToken"])["users"][0]["emailVerified"]:
+                session["user"] = email
+                return redirect("/dashboard")
+            else: # email not verified
+                print("email not verified")
+                return redirect("/login")
         except:
             return "Failed to Login"
     return render_template("login.html")
+
 
 @app.route("/resetPassword", methods=["POST", "GET"])
 def reset_password():
@@ -42,10 +48,20 @@ def logout():
     return redirect("/login")
 
 
-@app.route("/register")
+@app.route("/register", methods=["POST", "GET"])
 def register():
-    app.logger.debug("register request")
-    return render_template("register.html")
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+        try:
+            user = auth.create_user_with_email_and_password(email, password)
+            auth.send_email_verification(user["idToken"])
+            return redirect("/login")
+        except Exception as e:
+            return redirect("/register")
+
+    elif request.method == "GET":
+        return render_template("register.html")
 
 
 @app.route("/dashboard")
