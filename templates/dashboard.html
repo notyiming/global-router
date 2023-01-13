@@ -14,7 +14,7 @@
         </li> -->
       </ul>
       <span class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <a class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
           {% if user %}
             {{user}}
           {% else %}
@@ -28,4 +28,17 @@
     </div>
   </div>
 </nav>
+
+<div class="container-fluid">
+  <div class="row vh-100">
+    <div class="col-5 my-4">
+      <h2 class="text-muted">Dashboard</h2>
+
+    </div>
+    <div class="col-7 my-4">
+      <h2 class="text-muted">Visualization</h2>
+
+    </div>
+  </div>
+</div>
 {% include "footer.html" %}
