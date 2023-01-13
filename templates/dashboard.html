@@ -1,2 +1,31 @@
-logged in
-<a href="/logout"> logout</a>
+<!doctype html>
+<title>Dashboard</title>
+{% include "header.html" %}
+<nav class="navbar navbar-expand-lg navbar-light login-bg">
+  <div class="container-fluid">
+    <a class="navbar-brand display-5 fw-bold ls-tight" style="color: hsl(221, 55%, 88%)" href="#">Global Router</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <!-- <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li> -->
+      </ul>
+      <span class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          {% if user %}
+            {{user}}
+          {% else %}
+            User
+          {% endif %}
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <li><a class="dropdown-item" href="/logout">Logout</a></li>
+        </ul>
+      </span>
+    </div>
+  </div>
+</nav>
+{% include "footer.html" %}
