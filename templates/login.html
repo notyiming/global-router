@@ -26,6 +26,22 @@
             <form action="/login", method="POST">
               <!-- Email input -->
               <h3 class="text-center py-2" style="color:rgb(72, 88, 146)">Login</h3>
+              {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+              {% for category, message in messages %}
+              {% if category == "error" %}
+                <div class="alert alert-danger" role="alert">
+                  {{ message }}
+                </div>
+              {% elif category == "info" %}
+                <div class="alert alert-primary" role="alert">
+                  {{ message }}
+                </div>
+              {% endif %}
+              {% endfor %}
+              {% endif %}
+              {% endwith %}
+
               <div class="form-floating mb-3">
                 <input type="email" class="form-control" id="emailInput" name="email" required placeholder="name@example.com">
                 <label for="emailInput">Email address</label>

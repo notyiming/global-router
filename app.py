@@ -1,4 +1,4 @@
-from flask import Flask, session, render_template, request, redirect
+from flask import Flask, flash, session, render_template, request, redirect
 from fbconfig import config
 import pyrebase
 
@@ -23,11 +23,12 @@ def login():
             if auth.get_account_info(user["idToken"])["users"][0]["emailVerified"]:
                 session["user"] = email
                 return redirect("/dashboard")
-            else: # email not verified
-                print("email not verified")
+            else:  # email not verified
+                flash("Email has not been verified yet", "error")
                 return redirect("/login")
         except:
-            return "Failed to Login"
+            flash("Invalid Credentials", "error")
+            return redirect("/login")
     return render_template("login.html")
 
 
@@ -36,7 +37,9 @@ def reset_password():
     if request.method == "POST":
         email = request.form.get("email_to_reset")
         auth.send_password_reset_email(email)
+
         # notify user that password reset link has been sent
+        flash(f"Password reset link sent to {email}", "info")
         return redirect("/login")
     elif request.method == "GET":
         return render_template("reset_password.html")
@@ -45,6 +48,7 @@ def reset_password():
 @app.route("/logout")
 def logout():
     session.pop("user")
+    flash("Logged out successfully", "info")
     return redirect("/login")
 
 
@@ -56,6 +60,7 @@ def register():
         try:
             user = auth.create_user_with_email_and_password(email, password)
             auth.send_email_verification(user["idToken"])
+            flash("Account created, please verify email", "info")
             return redirect("/login")
         except Exception as e:
             return redirect("/register")
@@ -69,4 +74,4 @@ def dashboard():
     if not "user" in session:
         return redirect("/login")
     app.logger.debug("dashboard request")
-    return render_template("dashboard.html")
+    return render_template("dashboard.html", user=session["user"])
