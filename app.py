@@ -1,4 +1,5 @@
 from flask import Flask, flash, session, render_template, request, redirect
+from requests import HTTPError
 from fbconfig import config
 import pyrebase
 
@@ -62,7 +63,14 @@ def register():
             auth.send_email_verification(user["idToken"])
             flash("Account created, please verify email", "info")
             return redirect("/login")
-        except Exception as e:
+        except HTTPError as e:
+            e = str(e)
+            if "EMAIL_EXISTS" in e:
+                flash("Email already taken", "error")
+            elif "WEAK_PASSWORD" in e:
+                flash("Password should be at least 6 characters", "error")
+            else:
+                flash("Other HTTP error occured", "error")
             return redirect("/register")
 
     elif request.method == "GET":
