@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
+storage = firebase.storage()
 
 app.secret_key = "ming"
 
@@ -83,3 +84,12 @@ def dashboard():
         return redirect("/login")
     app.logger.debug("dashboard request")
     return render_template("dashboard.html", user=session["user"])
+
+
+# @app.route("/putfile", method="POST")
+# def putfile():
+#     print(storage)
+#     print(storage.child)
+#     return []
+#     return (storage)
+#     return (storage.child)
