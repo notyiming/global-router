@@ -1,7 +1,7 @@
 """Path Module"""
 
 from typing import List, Tuple
-from components.node import Node
+from models.node import Node
 
 class Path:
     """Path Class"""

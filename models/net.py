@@ -1,7 +1,7 @@
 """Net Module"""
 
 from typing import List, Tuple
-from components.path import Path
+from models.path import Path
 
 class Net:
     """Net Class"""

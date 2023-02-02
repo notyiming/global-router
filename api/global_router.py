@@ -3,7 +3,7 @@
 import os
 import math
 from typing import List
-from components.net import Net
+from models.net import Net
 from utils import utils
 
 
