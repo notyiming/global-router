@@ -3,3 +3,4 @@ output/
 *.pyc
 .vscode
 fbconfig.py
+doc/_build/
