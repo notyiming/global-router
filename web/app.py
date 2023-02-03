@@ -3,7 +3,7 @@
 from flask import Flask, flash, session, render_template, request, redirect
 from requests import HTTPError
 import pyrebase
-from fbconfig import config, secret_key
+from fbconfig import config, secret_key # pylint: disable=E0401
 
 app = Flask(__name__)
 
