@@ -8,8 +8,10 @@ Welcome to Global Router's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contents
 
+   cli
+   models
 
 
 Indices and tables
