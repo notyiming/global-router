@@ -2,5 +2,5 @@ testcase/
 output/
 *.pyc
 .vscode
-fbconfig.py
+.env
 doc/_build/

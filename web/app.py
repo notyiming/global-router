@@ -3,15 +3,16 @@
 from flask import Flask, flash, session, render_template, request, redirect
 from requests import HTTPError
 import pyrebase
-from fbconfig import config, secret_key # pylint: disable=E0401
+from dotenv import dotenv_values
 
 app = Flask(__name__)
 
+config = dotenv_values("../.env")
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 storage = firebase.storage()
 
-app.secret_key = secret_key
+app.secret_key = config["secretKey"]
 
 
 @app.route("/")
