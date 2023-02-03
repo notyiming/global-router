@@ -3,7 +3,7 @@
 
 import unittest
 
-from api.global_router import GlobalRouter
+from models.global_router import GlobalRouter
 
 
 class TestGlobalRouter(unittest.TestCase):
