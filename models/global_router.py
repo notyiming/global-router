@@ -4,7 +4,6 @@ import os
 import math
 from typing import List
 from models.net import Net
-from util import util
 
 
 class GlobalRouter:
@@ -67,7 +66,6 @@ class GlobalRouter:
                     f"{self.demand[i]/(self.horizontal_capacity if i < self.number_of_horizontal_edges else self.vertical_capacity)} "
                 )
 
-    @util.timeit
     def parse_input(self, input_file_path: str) -> List[Net]:
         """Parse the netlist input file
 
