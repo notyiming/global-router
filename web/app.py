@@ -89,12 +89,3 @@ def dashboard():
     if "user" not in session:
         return redirect("/login")
     return render_template("dashboard.html", user=session["user"])
-
-
-# @app.route("/putfile", method="POST")
-# def putfile():
-#     print(storage)
-#     print(storage.child)
-#     return []
-#     return (storage)
-#     return (storage.child)
