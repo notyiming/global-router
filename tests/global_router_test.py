@@ -11,7 +11,7 @@ class TestGlobalRouter(unittest.TestCase):
     def test_parse_input(self):
         """test parse input"""
         # GlobalRouter.parse_input()
-    
+
     def test_global_router_instance(self):
         """test global router class instance"""
         self.assertIsInstance(GlobalRouter(), GlobalRouter)
