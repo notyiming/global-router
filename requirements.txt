@@ -3,3 +3,4 @@ Flask
 pyrebase
 Pyrebase4
 requests
+sphinx-click
