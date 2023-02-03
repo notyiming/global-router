@@ -3,7 +3,7 @@
 
 import math
 import click
-from api.global_router import GlobalRouter
+from models.global_router import GlobalRouter
 
 @click.group()
 def gr_cli():
