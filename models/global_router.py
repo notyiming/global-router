@@ -120,7 +120,7 @@ class GlobalRouter:
             return self.netlist
 
     def is_overflow(self, path: Path) -> bool:
-        """Determines if overflow exists
+        """Determines if overflow exists for a path
 
         Args:
             path (Path): layout path
