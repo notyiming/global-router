@@ -1,7 +1,7 @@
 """Net Module"""
 
 import math
-from typing import List, Tuple
+from typing import List, Tuple, NoReturn
 from models.path import Path
 
 
@@ -16,7 +16,7 @@ class Net:
         self.path: Path = None
         self.hpwl: int = self.update_hpwl()
 
-    def update_hpwl(self):
+    def update_hpwl(self) -> int:
         """_summary_"""
         min_x = math.inf
         min_y = math.inf
@@ -28,3 +28,14 @@ class Net:
             max_x = max(coordinate[0], max_x)
             max_y = max(coordinate[1], max_y)
         return (max_x - min_x) + (max_y - min_y)
+
+    def attach_path(self, path: Path) -> NoReturn:
+        """Attach full routing path to the net
+
+        Args:
+            path (Path): full routed path
+
+        Returns:
+            NoReturn:
+        """
+        self.path = path
