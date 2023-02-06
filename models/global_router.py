@@ -4,6 +4,7 @@ import os
 import math
 from typing import List
 from models.net import Net
+from models.path import Path
 
 
 class GlobalRouter:
@@ -43,8 +44,14 @@ class GlobalRouter:
         with open(output_file_path, file_mode, encoding="UTF-8") as output:
             for net in self.netlist:
                 output.write(f"{net.net_name} {net.net_id}\n")
-                # path = Path()
-                # for i in range(len(coords))
+                path = net.path
+                coordinates = path.coordinates_list
+                for i in range(len(coordinates) - 1):
+                    output.write(
+                        f"({coordinates[i][0]}, {coordinates[i][1]}, 1)")
+                    output.write("-")
+                    output.write(
+                        f"({coordinates[i+1][0]}, {coordinates[i+1][1]}, 1)")
                 output.write("!\n")
 
     def rip_up_and_reroute(self):
@@ -60,7 +67,8 @@ class GlobalRouter:
             output_file_name (str): name of the output file
         """
         with open(f"{output_file_name}.fig", "x", encoding="utf-8") as output:
-            output.write(f"{self.grid_horizontal_size} {self.grid_vertical_size}\n")
+            output.write(
+                f"{self.grid_horizontal_size} {self.grid_vertical_size}\n")
             for i in range(self.number_of_edges):
                 output.write(
                     f"{self.demand[i]/(self.horizontal_capacity if i < self.number_of_horizontal_edges else self.vertical_capacity)} "
@@ -110,3 +118,18 @@ class GlobalRouter:
             )
             self.demand = [0] * self.number_of_edges
             return self.netlist
+
+    def is_overflow(self, path: Path) -> bool:
+        """Determines if overflow exists
+
+        Args:
+            path (Path): layout path
+
+        Returns:
+            bool: layout has overflow
+        """
+        for edge_id in path.edge_id_list:
+            if self.demand[edge_id] > self.horizontal_capacity \
+                    if edge_id < self.number_of_horizontal_edges else self.vertical_capacity:
+                return True
+        return False
