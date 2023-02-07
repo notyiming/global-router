@@ -5,6 +5,7 @@ import math
 import click
 from models.global_router import GlobalRouter
 
+
 @click.group()
 def gr_cli():
     """Global Router Application"""
@@ -29,16 +30,17 @@ def global_route(input_file: str, output_file: str):
     best_route_overflow = math.inf
     best_wire_length = math.inf
 
-    global_router.global_route()
+    total_overflow, total_wirelength = global_router.global_route()
 
-    best_route_overflow = max(best_route_overflow, global_router.total_overflow)
-    best_wire_length = max(best_wire_length, global_router.total_wire_length)
+    best_route_overflow = max(best_route_overflow, total_overflow)
+    best_wire_length = max(best_wire_length, total_wirelength)
 
     if best_route_overflow > 0:
         global_router.rip_up_and_reroute()
 
     global_router.dump_result(output_file)
     global_router.generate_congestion_output(output_file)
+
 
 if __name__ == "__main__":
     gr_cli()
