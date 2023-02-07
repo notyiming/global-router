@@ -54,7 +54,7 @@ class GlobalRouter:
                         f"({coordinates[i][0]}, {coordinates[i][1]}, 1)")
                     output.write("-")
                     output.write(
-                        f"({coordinates[i+1][0]}, {coordinates[i+1][1]}, 1)")
+                        f"({coordinates[i+1][0]}, {coordinates[i+1][1]}, 1)\n")
                 output.write("!\n")
 
     def rip_up_and_reroute(self):
@@ -177,7 +177,7 @@ class GlobalRouter:
                 best_path = current_node
                 break
 
-            for i in range(4):
+            for i in range(4):  # bfs (all direction)
                 next_coordinate = self.get_next_coordinate(
                     current_node.coordinates, i)
                 if not self.coordinate_is_legal(next_coordinate):
