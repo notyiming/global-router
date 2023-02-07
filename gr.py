@@ -4,6 +4,7 @@
 import math
 import click
 from models.global_router import GlobalRouter
+from web.app import app
 
 
 @click.group()
@@ -40,6 +41,11 @@ def global_route(input_file: str, output_file: str):
 
     global_router.dump_result(output_file)
     global_router.generate_congestion_output(output_file)
+
+@gr_cli.command()
+def gui():
+    """Lauch Global Router GUI"""
+    app.run(debug=True)
 
 
 if __name__ == "__main__":

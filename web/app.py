@@ -8,6 +8,8 @@ from dotenv import dotenv_values
 app = Flask(__name__)
 
 config = dotenv_values("../.env")
+if len(config) == 0:
+    config = dotenv_values(".env")
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 storage = firebase.storage()
@@ -90,3 +92,6 @@ def dashboard():
     if "user" not in session:
         return redirect("/login")
     return render_template("dashboard.html", user=session["user"])
+
+if __name__ == '__main__':
+    app.run(debug=True)
