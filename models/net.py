@@ -6,7 +6,7 @@ from models.path import Path
 
 
 class Net:
-    """Net Class"""
+    """Net class represents a wire that connects two or more pins"""
 
     def __init__(self, net_id, net_name, num_of_pins, net_pins_coordinates) -> None:
         self.net_id: int = net_id

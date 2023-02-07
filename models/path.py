@@ -5,7 +5,7 @@ from models.node import Node
 
 
 class Path:
-    """Path Class"""
+    """Path class represents the full path of a net"""
 
     def __init__(self, end_node) -> None:
         self.coordinates_list: List[Tuple[int, int]] = []
