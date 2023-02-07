@@ -4,4 +4,3 @@ pyrebase
 Pyrebase4
 python-dotenv
 requests
-sphinx-click
