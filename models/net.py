@@ -17,7 +17,11 @@ class Net:
         self.hpwl: int = self.update_hpwl()
 
     def update_hpwl(self) -> int:
-        """_summary_"""
+        """Set the value of HPWL (Half-Perimeter Wirelength)
+
+        Returns:
+            int: HPWL (Half-Perimeter Wirelength)
+        """
         min_x = math.inf
         min_y = math.inf
         max_x = 0
