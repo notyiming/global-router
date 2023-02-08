@@ -46,7 +46,7 @@ def global_route(input_file: str, output_file: str):
 @click.option("-p", "--port", help="Port Selection", type=int)
 @click.option("-d", "--debug", is_flag=True, help="Toggle debug mode")
 def gui(port=5000, debug=False):
-    """Lauch Global Router GUI"""
+    """Launch Global Router GUI"""
     app.run(port=port, debug=debug)
 
 
