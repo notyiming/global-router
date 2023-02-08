@@ -1,6 +1,5 @@
 """Flask App"""
 
-import sys
 from flask import Flask, flash, session, render_template, request, redirect
 from requests import HTTPError
 import pyrebase
@@ -11,8 +10,6 @@ app = Flask(__name__)
 config = dotenv_values("../.env")
 if len(config) == 0:
     config = dotenv_values(".env")
-if len(config) == 0:
-    sys.exit()
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 storage = firebase.storage()
