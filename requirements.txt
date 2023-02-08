@@ -1,6 +1,6 @@
 click
 Flask
-pyrebase
+pycryptodome
 Pyrebase4
 python-dotenv
 requests
