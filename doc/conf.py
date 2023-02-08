@@ -19,6 +19,7 @@ author = 'Yi Ming Tan'
 extensions = ['sphinx_rtd_theme',
               'sphinx_click',
               'sphinx_search.extension',
+              'sphinx.ext.viewcode',
               'sphinx.ext.autodoc']
 
 templates_path = ['_templates']
