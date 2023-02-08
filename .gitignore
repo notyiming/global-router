@@ -4,4 +4,4 @@ output/
 .vscode
 .env
 doc/_build/
-logs/
+*.log
