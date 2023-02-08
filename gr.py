@@ -43,9 +43,11 @@ def global_route(input_file: str, output_file: str):
     global_router.generate_congestion_output(output_file)
 
 @gr_cli.command()
-def gui():
+@click.option("-p", "--port", help="Port Selection", type=int)
+@click.option("-d", "--debug", is_flag=True, help="Toggle debug mode")
+def gui(port=5000, debug=False):
     """Lauch Global Router GUI"""
-    app.run(debug=True)
+    app.run(port=port, debug=debug)
 
 
 if __name__ == "__main__":
