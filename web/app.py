@@ -7,13 +7,25 @@ from dotenv import dotenv_values
 
 app = Flask(__name__)
 
-config = dotenv_values("../.env")
+config = dotenv_values()
+
+# for readthedocs, since .env is secret
 if len(config) == 0:
-    config = dotenv_values(".env")
+    config = {
+        "apiKey": "",
+        "authDomain": "",
+        "projectId": "",
+        "storageBucket": "",
+        "messagingSenderId": "",
+        "appId": "",
+        "measurementId": "",
+        "databaseURL": "",
+        "secretKey": ""
+    }
+
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 storage = firebase.storage()
-
 app.secret_key = config["secretKey"]
 
 
@@ -92,6 +104,7 @@ def dashboard():
     if "user" not in session:
         return redirect("/login")
     return render_template("dashboard.html", user=session["user"])
+
 
 if __name__ == '__main__':
     app.run(debug=True)
