@@ -5,3 +5,4 @@ output/
 .env
 doc/_build/
 *.log
+*.log.*

@@ -3,6 +3,7 @@
 import heapq
 import os
 from typing import List, Tuple
+import click
 from models.net import Net
 from models.node import Node
 from models.path import Path
@@ -23,7 +24,6 @@ class GlobalRouter:
         self.number_of_edges: int = 0
         self.number_of_horizontal_edges: int = 0
         self.demand: List[float] = []
-        # self.seed: int = 0
 
     @util.log_func
     def show_netlist_info(self) -> None:
@@ -34,7 +34,7 @@ class GlobalRouter:
             f"Grid: {self.grid_horizontal_size} x {self.grid_vertical_size}\n"
             f"Vertical Capacity: {self.vertical_capacity}\n"
             f"Horizontal Capacity: {self.horizontal_capacity}\n"
-            f"Number of nets: {len(self.netlist)}"
+            f"Number of nets: {len(self.netlist)}\n"
         )
 
     @util.log_func
@@ -60,6 +60,8 @@ class GlobalRouter:
                     output.write(
                         f"({coordinates[i+1][0]}, {coordinates[i+1][1]}, 1)\n")
                 output.write("!\n")
+            gr_logger.info(
+                f"Output successfully dumped into {output_file_path}")
 
     @util.timeit
     @util.log_func
@@ -245,13 +247,14 @@ class GlobalRouter:
     @util.log_func
     def global_route(self) -> Tuple[int, int]:
         """main global routing logic"""
-        for net in self.netlist:
-            self.route_two_pin_net(net)
-            self.update_demand(net.path, True)
+        with click.progressbar(self.netlist, label="Routing the netlist") as netlist:
+            for net in netlist:
+                self.route_two_pin_net(net)
+                self.update_demand(net.path, True)
 
         total_overflow, total_wirelength = self.update_overflow()
-
-        print(f"total_overflow: {total_overflow}\n------------------------------")
+        gr_logger.info(f"Total Overflow: {total_overflow}")
+        gr_logger.info(f"Total Wirelength: {total_wirelength}")
 
         return total_overflow, total_wirelength
 
@@ -272,8 +275,10 @@ class GlobalRouter:
                 output.write(
                     f"{self.demand[i]/(self.horizontal_capacity if i < self.number_of_horizontal_edges else self.vertical_capacity)} "
                 )
+            gr_logger.info(f"Congestion data generated into {output_file_name}.fig")
 
-    def parse_input(self, input_file_path: str) -> List[Net]:
+    @util.log_func
+    def parse_input(self, input_file_path: str):
         """Parse the netlist input file
 
         Args:
@@ -316,7 +321,8 @@ class GlobalRouter:
                 + (self.grid_vertical_size - 1) * self.grid_horizontal_size
             )
             self.demand = [0] * self.number_of_edges
-            return self.netlist
+            gr_logger.info(
+                f"{input_file_path} parsed successfully, data structures created")
 
     def is_overflow(self, path: Path) -> bool:
         """Determines if overflow exists for a path
