@@ -21,5 +21,6 @@ class Path:
             self.edge_id_list.append(current_grid.edge_id)
             current_grid = current_grid.prev
 
+        self.edge_id_list.pop()
         self.coordinates_list.reverse()
         self.edge_id_list.reverse()
