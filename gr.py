@@ -33,8 +33,8 @@ def global_route(input_file: str, output_file: str):
 
     total_overflow, total_wirelength = global_router.global_route()
 
-    best_route_overflow = max(best_route_overflow, total_overflow)
-    best_wire_length = max(best_wire_length, total_wirelength)
+    best_route_overflow = min(best_route_overflow, total_overflow)
+    best_wire_length = min(best_wire_length, total_wirelength)
 
     if best_route_overflow > 0:
         global_router.rip_up_and_reroute()
