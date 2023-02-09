@@ -32,14 +32,3 @@ class Net:
             max_x = max(coordinate[0], max_x)
             max_y = max(coordinate[1], max_y)
         return (max_x - min_x) + (max_y - min_y)
-
-    def attach_path(self, path: Path) -> NoReturn:
-        """Attach full routing path to the net
-
-        Args:
-            path (Path): full routed path
-
-        Returns:
-            NoReturn:
-        """
-        self.path = path
