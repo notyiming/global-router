@@ -2,13 +2,12 @@
 
 import heapq
 import os
-import math
-# import random
-# import time
 from typing import List, Tuple
 from models.net import Net
 from models.node import Node
 from models.path import Path
+from gr_logger import gr_logger
+from util import util
 
 
 class GlobalRouter:
@@ -19,7 +18,6 @@ class GlobalRouter:
         self.grid_vertical_size: int = 0
         self.vertical_capacity: int = 0
         self.horizontal_capacity: int = 0
-        self.netlist_size: int = 0
         self.netlist: List[Net] = []
         self.number_of_nodes: int = 0
         self.number_of_edges: int = 0
@@ -27,13 +25,19 @@ class GlobalRouter:
         self.demand: List[float] = []
         # self.seed: int = 0
 
+    @util.log_func
     def show_netlist_info(self) -> None:
         """Prints netlist info to the terminal"""
-        print(f"Grid: {self.grid_horizontal_size} x {self.grid_vertical_size}")
-        print(f"Vertical Capacity: {self.vertical_capacity}")
-        print(f"Horizontal Capacity: {self.horizontal_capacity}")
-        print(f"Number of nets: {self.netlist_size}")
+        gr_logger.info(
+            "\nLayout and Netlist Details\n"
+            "==========================\n"
+            f"Grid: {self.grid_horizontal_size} x {self.grid_vertical_size}\n"
+            f"Vertical Capacity: {self.vertical_capacity}\n"
+            f"Horizontal Capacity: {self.horizontal_capacity}\n"
+            f"Number of nets: {len(self.netlist)}"
+        )
 
+    @util.log_func
     def dump_result(self, output_file_path: str) -> None:
         """Dumps the route result into an output file
 
@@ -57,6 +61,8 @@ class GlobalRouter:
                         f"({coordinates[i+1][0]}, {coordinates[i+1][1]}, 1)\n")
                 output.write("!\n")
 
+    @util.timeit
+    @util.log_func
     def rip_up_and_reroute(self):
         """rip up and reroute"""
 
@@ -198,7 +204,7 @@ class GlobalRouter:
 
                 heapq.heappush(priority_queue, next_node)
 
-        net.attach_path(Path(best_path))
+        net.path = Path(best_path)
 
     def update_demand(self, path: Path, increment: bool):
         """Update demand level for the path
@@ -225,48 +231,28 @@ class GlobalRouter:
         overflow = 0
         for i in range(self.number_of_edges):
             total_wirelength += self.demand[i]
-            overflow = self.demand[i] - \
-                self.horizontal_capacity if i < self.number_of_horizontal_edges else self.vertical_capacity
+            capacity = self.vertical_capacity
+            if i < self.number_of_horizontal_edges:
+                capacity = self.horizontal_capacity
+            overflow = self.demand[i] - capacity
             if overflow <= 0:
                 continue
             total_overflow += overflow
             max_overflow = max(overflow, max_overflow)
         return (total_overflow, total_wirelength)
 
+    @util.timeit
+    @util.log_func
     def global_route(self) -> Tuple[int, int]:
         """main global routing logic"""
-        cur_seed = 0
-        num_init_trials = 10
-        seed_feasible = False
-        init_wirelength = math.inf
-        init_overflow: int = 0
+        for net in self.netlist:
+            self.route_two_pin_net(net)
+            self.update_demand(net.path, True)
 
-        for _ in range(1 if seed_feasible else num_init_trials):
-            # reset to original order
-            self.netlist.sort(key=lambda x: x.net_id)
+        total_overflow, total_wirelength = self.update_overflow()
 
-            # random.seed(cur_seed if i == (
-            #     1 if seed_feasible else num_init_trials) - 1 else int(time.time()))
-            # random.shuffle(self.netlist)
-            self.netlist.sort(key=lambda x: x.hpwl)  # sort by its hpwl
+        print(f"total_overflow: {total_overflow}\n------------------------------")
 
-            for net in self.netlist:
-                if net.num_of_pins == 2:
-                    self.route_two_pin_net(net)
-                self.update_demand(net.path, True)
-
-            total_overflow, total_wirelength = self.update_overflow()
-            if total_overflow <= init_overflow:
-                if total_wirelength < init_wirelength or \
-                        total_overflow < init_overflow:
-                    # self.seed = cur_seed
-                    init_overflow = total_overflow
-                    init_wirelength = total_wirelength
-
-                    print(
-                        f"seed {cur_seed}, overflow: {total_wirelength}, wirelength: {total_wirelength}")
-
-        self.netlist.sort(key=lambda x: x.net_id)  # reset to original order
         return total_overflow, total_wirelength
 
     def generate_congestion_output(self, output_file_name: str) -> None:
@@ -307,8 +293,8 @@ class GlobalRouter:
             self.grid_vertical_size = int(grid_data[2])
             self.vertical_capacity = int(file.readline().split()[2])
             self.horizontal_capacity = int(file.readline().split()[2])
-            self.netlist_size = int(file.readline().split()[2])
-            for _ in range(self.netlist_size):
+            netlist_size = int(file.readline().split()[2])
+            for _ in range(netlist_size):
                 net_info = file.readline().split()
                 net_name = net_info[0]
                 net_id = int(net_info[1])
