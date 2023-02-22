@@ -4,6 +4,7 @@ output/
 .vscode
 .env
 doc/_build/
-gr_logs/*.log.*
+gr_logs/*.log*
 .pytest_cache/
 __pycache__/
+congestion_plots/
