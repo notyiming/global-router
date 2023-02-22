@@ -2,7 +2,7 @@
 
 from functools import wraps
 from time import time
-from gr_logger import gr_logger
+from gr_logs.gr_logger import gr_logger
 
 def timeit(func):
     """Decorator to time function run time
