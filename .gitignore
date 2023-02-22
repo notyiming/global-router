@@ -4,5 +4,6 @@ output/
 .vscode
 .env
 doc/_build/
-*.log
-*.log.*
+gr_logs/*.log.*
+.pytest_cache/
+__pycache__/
