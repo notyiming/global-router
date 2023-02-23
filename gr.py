@@ -60,9 +60,9 @@ def gui(port=5000, debug=False):
 
 @gr_cli.command()
 @click.option("-c", "--congestion_data_file_path", help="Congestion data file path", required=True)
-@click.option("-p", "--plot_figure_filename", help="Plot figure filename", required=True)
+@click.option("-p", "--plot_figure_filepath", help="Plot figure filename", required=True)
 @click.option("-d", "--display_plot_from_cli", is_flag=True, help="Display plot from CLI")
-def plot_congestion(congestion_data_file_path: str, plot_figure_filename: str, display_plot_from_cli=False):
+def plot_congestion(congestion_data_file_path: str, plot_figure_filepath: str, display_plot_from_cli=False):
     """Plot congestion data visualization
     \f
 
@@ -138,7 +138,7 @@ def plot_congestion(congestion_data_file_path: str, plot_figure_filename: str, d
     )
 
     ax.autoscale_view()
-    plt.savefig(f"congestion_plots/{plot_figure_filename}", dpi=300)
+    plt.savefig(f"{plot_figure_filepath}", dpi=300)
 
     if display_plot_from_cli:
         plt.show()
