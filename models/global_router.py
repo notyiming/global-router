@@ -290,8 +290,6 @@ class GlobalRouter:
         Returns:
             List[Net]: list of all nets
         """
-        if not os.path.exists(input_file_path):
-            raise FileNotFoundError(f"{input_file_path} does not exist.")
         with open(input_file_path, "r", encoding="utf-8") as file:
             grid_data = file.readline().split()
             self.grid_horizontal_size = int(grid_data[1])
