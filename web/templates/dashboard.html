@@ -4,7 +4,8 @@
 <nav class="navbar navbar-expand-lg navbar-light login-bg">
   <div class="container-fluid">
     <a class="navbar-brand display-5 fw-bold ls-tight" style="color: hsl(221, 55%, 88%)" href="#">Global Router</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+      aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
@@ -14,11 +15,12 @@
         </li>
       </ul>
       <span class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <a class="nav-link dropdown-toggle text-white" id="navbarDropdownMenuLink" role="button"
+          data-bs-toggle="dropdown" aria-expanded="false">
           {% if user %}
-            {{user}}
+          {{user}}
           {% else %}
-            User
+          User
           {% endif %}
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -33,14 +35,30 @@
   <div class="row vh-100">
     <div class="col-5 my-4 p-3">
       <h2 class="text-muted">Dashboard</h2>
-      <label class="form-label" for="inputFile">Upload input netlist file</label>
-      <input type="file" class="form-control" id="inputFile" />
-
+      <form action="/dashboard" id="netlist-input-form" type="file" enctype="multipart/form-data">
+        <label class="form-label" for="inputFile">Upload input netlist file</label>
+        <input type="file" class="form-control" name="inputFile" accept=".txt" required/>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        {% if category == "error" %}
+          <div class="alert alert-danger" role="alert">
+            {{ message }}
+          </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <button type="submit" class="btn btn-primary">Submit Netlist</button>
+      </form>
+      <button type="button" id="sample-netlist" class="btn btn-primary">Use sample netlist</button>
     </div>
     <div class="col-7 my-4 p-3">
       <h2 class="text-muted">Visualization</h2>
-
+      <img id="congestion-plot" alt="Congestion Data Plot" width="900px" style="border-radius: 10px;">
     </div>
   </div>
 </div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='scripts/ajax.js')}}"></script>
 {% include "footer.html" %}
