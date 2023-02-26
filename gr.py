@@ -5,7 +5,7 @@ import math
 import click
 from matplotlib import patches, pyplot as plt
 from models.global_router import GlobalRouter
-from web.app import app
+import web.app as flask_app
 
 
 @click.group()
@@ -55,7 +55,7 @@ def gui(port=5000, debug=False):
         port (int, optional): Port number. Defaults to 5000.
         debug (bool, optional): Debug flag. Defaults to False.
     """
-    app.run(port=port, debug=debug)
+    flask_app.app.run(port=port, debug=debug)
 
 
 @gr_cli.command()
@@ -81,42 +81,43 @@ def plot_congestion(congestion_data_file_path: str, plot_figure_filepath: str, d
         num_hor = (grid_hor - 1)*grid_ver
         congestion_data = [float(n) for n in data.readline().split()]
 
-        for i, congestion_level in enumerate(congestion_data):
-            if congestion_level == 0:
-                edge_color = "white"
-            elif congestion_level <= 0.25:
-                edge_color = "blue"
-            elif congestion_level <= 0.5:
-                edge_color = "cyan"
-            elif congestion_level <= 0.75:
-                edge_color = "green"
-            elif congestion_level <= 1.0:
-                edge_color = "yellow"
-            else:
-                edge_color = "red"
+        with click.progressbar(congestion_data, label="Generating Congestion Plot") as congestion_data:
+            for i, congestion_level in enumerate(congestion_data):
+                if congestion_level == 0:
+                    edge_color = "white"
+                elif congestion_level <= 0.25:
+                    edge_color = "blue"
+                elif congestion_level <= 0.5:
+                    edge_color = "cyan"
+                elif congestion_level <= 0.75:
+                    edge_color = "green"
+                elif congestion_level <= 1.0:
+                    edge_color = "yellow"
+                else:
+                    edge_color = "red"
 
-            if i < num_hor:
-                x = 0.15 + int(i % (grid_hor-1))*0.6
-                y = int(i/(grid_hor-1))*0.6
-                ax.add_patch(patches.Rectangle(
-                    (x, y),
-                    0.4,
-                    0.1,
-                    edgecolor=edge_color,
-                    facecolor=edge_color,
-                    linestyle='-',
-                ))
-            else:
-                x = int((i-num_hor) % (grid_hor))*0.6
-                y = 0.15 + int((i-num_hor)/(grid_hor))*0.6
-                ax.add_patch(patches.Rectangle(
-                    (x, y),
-                    0.1,
-                    0.4,
-                    edgecolor=edge_color,
-                    facecolor=edge_color,
-                    linestyle='-',
-                ))
+                if i < num_hor:
+                    x = 0.15 + int(i % (grid_hor-1))*0.6
+                    y = int(i/(grid_hor-1))*0.6
+                    ax.add_patch(patches.Rectangle(
+                        (x, y),
+                        0.4,
+                        0.1,
+                        edgecolor=edge_color,
+                        facecolor=edge_color,
+                        linestyle='-',
+                    ))
+                else:
+                    x = int((i-num_hor) % (grid_hor))*0.6
+                    y = 0.15 + int((i-num_hor)/(grid_hor))*0.6
+                    ax.add_patch(patches.Rectangle(
+                        (x, y),
+                        0.1,
+                        0.4,
+                        edgecolor=edge_color,
+                        facecolor=edge_color,
+                        linestyle='-',
+                    ))
     ax.set_aspect('equal', adjustable='box')
     ax.set_frame_on(False)
     ax.get_xaxis().set_visible(False)

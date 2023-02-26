@@ -1,11 +1,20 @@
 """Flask App"""
 
+from pathlib import Path
+import os
 from flask import Flask, flash, session, render_template, request, redirect
+from werkzeug.utils import secure_filename
 from requests import HTTPError
 import pyrebase
 from dotenv import dotenv_values
+import gr
+
+
+UPLOAD_FOLDER = 'uploaded_netlists'
 
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 config = dotenv_values()
 
@@ -98,12 +107,43 @@ def register():
         return render_template("register.html")
 
 
-@app.route("/dashboard")
+@app.route("/dashboard", methods=["POST", "GET"])
 def dashboard():
     """Lauch User Dashboard"""
     if "user" not in session:
         return redirect("/login")
+
+    if request.method == "POST":
+        if not request.files:
+            netlist_file = (request.get_data().decode())
+            file_basename = Path(netlist_file).stem
+        
+        else:
+            if "inputFile" not in request.files:
+                flash("No file part", "error")
+                return redirect("/dashboard")
+            file = request.files["inputFile"]
+            if not file.filename:
+                flash("No selected file", "error")
+                return redirect("/dashboard")
+            if file and _allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                netlist_file = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                file.save(netlist_file)
+        file_basename = Path(netlist_file).stem
+
+        gr.global_route.callback(netlist_file, f"output/{file_basename}.out")
+        gr.plot_congestion.callback(f"output/{file_basename}.out.fig", f"web/static/{file_basename}.png")
+
+        return f"static/{file_basename}.png"
+
+
     return render_template("dashboard.html", user=session["user"])
+
+def _allowed_file(filename: str) -> bool:
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() == "txt"
 
 
 if __name__ == '__main__':
