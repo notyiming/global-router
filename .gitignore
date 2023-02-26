@@ -8,3 +8,5 @@ logs/*.log*
 .pytest_cache/
 __pycache__/
 congestion_plots/
+web/static/*.png
+uploaded_netlists/
