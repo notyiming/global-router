@@ -19,18 +19,12 @@ $(document).ready(function () {
 
     $('#sample-netlist').on('click', function (e) {
         $('#congestion-plot').attr("alt", "loading...").attr("src", "");
-        var data = {"sample_netlist_file_path": "testcase/example.txt"}
         $.ajax({
-            data: JSON.stringify(data),
+            data: "testcase/example.txt",
             type: 'POST',
             url: '/dashboard',
-            contentType: "application/json",
-            dataType: "json",
-
-            // cache: false,
-            // processData: false,
+            contentType: false,
             success: function (result) {
-                console.log("hello?");
                 $('#congestion-plot').attr("src", result);
             }
         })
