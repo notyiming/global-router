@@ -1,7 +1,7 @@
 <!doctype html>
 <title>Dashboard</title>
 {% include "header.html" %}
-<nav class="navbar navbar-expand-lg navbar-light login-bg">
+<nav class="navbar navbar-expand-lg navbar-dark login-bg">
   <div class="container-fluid">
     <a class="navbar-brand display-5 fw-bold ls-tight" style="color: hsl(221, 55%, 88%)" href="#">Global Router</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
@@ -32,28 +32,21 @@
 </nav>
 
 <div class="container-fluid">
-  <div class="row vh-100">
-    <div class="col-5 my-4 p-3">
+  <div class="row ">
+    <div class="col-xl-4 my-4 p-4">
       <h2 class="text-muted">Dashboard</h2>
       <form action="/dashboard" id="netlist-input-form" type="file" enctype="multipart/form-data">
         <label class="form-label" for="inputFile">Upload input netlist file</label>
-        <input type="file" class="form-control" name="inputFile" accept=".txt" required/>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        {% if category == "error" %}
-          <div class="alert alert-danger" role="alert">
-            {{ message }}
-          </div>
-        {% endif %}
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
-        <button type="submit" class="btn btn-primary">Submit Netlist</button>
+        <div class="input-group mb-3">
+        <input type="file" class="form-control" id="inputFile" name="inputFile" accept=".txt" required />
+        <button type="submit" class="input-group-text btn btn-primary">Submit Netlist</button>
+        </div>
       </form>
-      <button type="button" id="sample-netlist" class="btn btn-primary">Use sample netlist</button>
+
+      <p>or</p>
+      <button type="button" id="sample-netlist" class="btn btn-primary mb-3">Use sample netlist</button>
     </div>
-    <div class="col-7 my-4 p-3">
+    <div class="col-xl-8 my-4 p-4">
       <h2 class="text-muted">Visualization</h2>
       <img id="congestion-plot" alt="Congestion Data Plot" width="900px" style="border-radius: 10px;">
     </div>
