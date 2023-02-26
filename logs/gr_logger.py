@@ -3,7 +3,7 @@ import logging
 import logging.handlers
 import os
 
-LOG_FILENAME = "gr_logs/gr.log"
+LOG_FILENAME = "logs/gr.log"
 should_roll_over = os.path.isfile(LOG_FILENAME)
 
 gr_logger = logging.getLogger("gr")

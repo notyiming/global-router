@@ -7,7 +7,7 @@ import click
 from models.net import Net
 from models.node import Node
 from models.path import Path
-from gr_logs.gr_logger import gr_logger
+from logs.gr_logger import gr_logger
 from util import util
 
 
