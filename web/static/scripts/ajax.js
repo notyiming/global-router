@@ -1,6 +1,6 @@
 $(document).ready(function () {
     $('#netlist-input-form').on('submit', function (e) {
-        $('#layout-details-list').attr('hidden', 'true');
+        $('#netlist-details-list').attr('hidden', 'true');
         $('#congestion-plot').attr("alt", "Generating Congestion Plot...").attr("src", "");
         $('#submit-netlist')
             .attr("disabled", "true")
@@ -23,7 +23,7 @@ $(document).ready(function () {
     });
 
     $('#sample-netlist').on('click', function (e) {
-        $('#layout-details-list').attr('hidden', 'true');
+        $('#netlist-details-list').attr('hidden', 'true');
         $('#congestion-plot').attr("alt", "Generating Congestion Plot...").attr("src", "");
         $('#sample-netlist')
             .attr("disabled", "true")
@@ -70,14 +70,14 @@ $(document).ready(function () {
 
 function update_view(result) {
     var congestion_plot_img = result["img_src"];
-    var ld = result["layout_details"];
+    var ld = result["netlist_details"];
     var gridhor = ld["grid_hor"];
     var gridver = ld["grid_ver"];
     var vercap = ld["ver_cap"];
     var horcap = ld["hor_cap"];
     var netlist_size = ld["netlist_size"];
     $('#no-netlist-provided-span').attr("hidden", "true");
-    $('#layout-details-list').removeAttr("hidden");
+    $('#netlist-details-list').removeAttr("hidden");
     $('#grid-size').html("Grid: " + gridhor + " x " + gridver);
     $('#horcap').html("Horizontal Capacity: " + horcap);
     $('#vercap').html("Vertical Capacity: " + vercap);

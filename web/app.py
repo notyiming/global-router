@@ -135,7 +135,7 @@ def dashboard():
         result = {}
         file_basename = Path(netlist_file).stem
         result["img_src"] = f"static/{file_basename}.png"
-        result["layout_details"] = gr.global_route.callback(netlist_file, f"output/{file_basename}.out")
+        result["netlist_details"] = gr.global_route.callback(netlist_file, f"output/{file_basename}.out")
         gr.plot_congestion.callback(f"output/{file_basename}.out.fig", f"web/static/{file_basename}.png")
 
         return jsonify(result)

@@ -324,13 +324,13 @@ class GlobalRouter:
             self.demand = [0] * self.number_of_edges
             gr_logger.info(
                 f"{input_file_path} parsed successfully, data structures created")
-            layout_details = {}
-            layout_details["grid_hor"] = self.grid_horizontal_size
-            layout_details["grid_ver"] = self.grid_vertical_size
-            layout_details["ver_cap"] = self.vertical_capacity
-            layout_details["hor_cap"] = self.horizontal_capacity
-            layout_details["netlist_size"] = netlist_size
-            return layout_details
+            netlist_details = {}
+            netlist_details["grid_hor"] = self.grid_horizontal_size
+            netlist_details["grid_ver"] = self.grid_vertical_size
+            netlist_details["ver_cap"] = self.vertical_capacity
+            netlist_details["hor_cap"] = self.horizontal_capacity
+            netlist_details["netlist_size"] = netlist_size
+            return netlist_details
 
     def is_overflow(self, path: Path) -> bool:
         """Determines if overflow exists for a path
