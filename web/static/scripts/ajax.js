@@ -4,7 +4,7 @@ $(document).ready(function () {
         $('#congestion-plot').attr("alt", "Generating Congestion Plot...").attr("src", "");
         $('#submit-netlist')
             .attr("disabled", "true")
-            .html("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span>Processing...");
+            .html("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Processing...");
         var netlist_input_data = new FormData($('#netlist-input-form')[0]);
         $.ajax({
             data: netlist_input_data,
@@ -27,7 +27,7 @@ $(document).ready(function () {
         $('#congestion-plot').attr("alt", "Generating Congestion Plot...").attr("src", "");
         $('#sample-netlist')
             .attr("disabled", "true")
-            .html("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span>Processing...");
+            .html("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Processing...");
         var selected_netlist = parseInt($('#sample-netlist-select').val());
         let sample_netlist_file;
         switch(selected_netlist) {
