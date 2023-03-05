@@ -38,13 +38,38 @@
       <form action="/dashboard" id="netlist-input-form" type="file" enctype="multipart/form-data">
         <label class="form-label" for="inputFile">Upload input netlist file</label>
         <div class="input-group mb-3">
-        <input type="file" class="form-control" id="inputFile" name="inputFile" accept=".txt" required />
-        <button type="submit" class="input-group-text btn btn-primary">Submit Netlist</button>
+          <input type="file" class="form-control" id="inputFile" name="inputFile" accept=".txt" required />
+          <button type="submit" id="submit-netlist" class="input-group-text btn btn-primary">Submit Netlist</button>
         </div>
       </form>
 
-      <p>or</p>
-      <button type="button" id="sample-netlist" class="btn btn-primary mb-3">Use sample netlist</button>
+      <p style="text-align: center; font-size: 1.5em;">or</p>
+
+      <div class="input-group mb-3">
+        <select class="form-select form-select mb-3" required aria-label=".form-select example"
+          id="sample-netlist-select">
+          <option disabled selected>Select a sample netlist</option>
+          <option value="1">Example</option>
+          <option value="2">IBM01</option>
+          <option value="3">IBM02</option>
+          <option value="4">IBM03</option>
+          <option value="5">IBM04</option>
+        </select>
+        <button type="button" id="sample-netlist" disabled class="input-group-text btn btn-primary mb-3">Select
+          Netlist</button>
+      </div>
+
+      <h4 class="text-muted mt-5">Layout Details</h4>
+      <span id="no-netlist-provided-span">
+        No netlist provided
+      </span>
+      <ul id="layout-details-list" hidden>
+        <li id="grid-size"></li>
+        <li id="horcap"></li>
+        <li id="vercap"></li>
+        <li id="netlist-size"></li>
+      </ul>
+
     </div>
     <div class="col-xl-8 my-4 p-4">
       <h2 class="text-muted">Congestion Visualization</h2>

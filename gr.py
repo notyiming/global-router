@@ -25,7 +25,7 @@ def global_route(input_file: str, output_file: str):
         output_file (str): Path to generated output file
     """
     global_router = GlobalRouter()
-    global_router.parse_input(input_file)
+    layout_details = global_router.parse_input(input_file)
     global_router.show_netlist_info()
 
     # best_route_index = 0
@@ -42,6 +42,7 @@ def global_route(input_file: str, output_file: str):
 
     global_router.dump_result(output_file)
     global_router.generate_congestion_output(output_file)
+    return layout_details
 
 
 @gr_cli.command()

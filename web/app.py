@@ -2,7 +2,7 @@
 
 from pathlib import Path
 import os
-from flask import Flask, flash, session, render_template, request, redirect
+from flask import Flask, flash, jsonify, session, render_template, request, redirect
 from werkzeug.utils import secure_filename
 from requests import HTTPError
 import pyrebase
@@ -117,7 +117,7 @@ def dashboard():
         if not request.files:
             netlist_file = (request.get_data().decode())
             file_basename = Path(netlist_file).stem
-        
+
         else:
             if "inputFile" not in request.files:
                 flash("No file part", "error")
@@ -131,12 +131,14 @@ def dashboard():
                 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
                 netlist_file = os.path.join(app.config["UPLOAD_FOLDER"], filename)
                 file.save(netlist_file)
-        file_basename = Path(netlist_file).stem
 
-        gr.global_route.callback(netlist_file, f"output/{file_basename}.out")
+        result = {}
+        file_basename = Path(netlist_file).stem
+        result["img_src"] = f"static/{file_basename}.png"
+        result["layout_details"] = gr.global_route.callback(netlist_file, f"output/{file_basename}.out")
         gr.plot_congestion.callback(f"output/{file_basename}.out.fig", f"web/static/{file_basename}.png")
 
-        return f"static/{file_basename}.png"
+        return jsonify(result)
 
 
     return render_template("dashboard.html", user=session["user"])
