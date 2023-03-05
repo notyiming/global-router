@@ -64,7 +64,7 @@ $(document).ready(function () {
             contentType: false,
             success: function (result) {
                 update_view(sample_netlist_file, result);
-                $('#sample-netlist').removeAttr("disabled").html("Use Sample Netlist");
+                $('#sample-netlist').removeAttr("disabled").html("Select Netlist");
             }
         })
         e.preventDefault();
