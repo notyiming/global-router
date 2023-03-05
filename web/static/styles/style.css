@@ -6,3 +6,7 @@
     background-color: hsla(0, 0%, 100%, 0.756) !important;
     backdrop-filter: saturate(200%) blur(25px);
 }
+
+body{
+    background-color: #eee;
+}
