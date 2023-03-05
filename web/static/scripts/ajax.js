@@ -5,7 +5,11 @@ $(document).ready(function () {
         $('#submit-netlist')
             .attr("disabled", "true")
             .html("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Processing...");
+        $('#no-netlist-provided-span')
+        .removeAttr('hidden')
+        .html("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Processing Netlist");
         var netlist_input_data = new FormData($('#netlist-input-form')[0]);
+        var netlist_name = $('#inputFile')[0].files[0].name;
         $.ajax({
             data: netlist_input_data,
             type: 'POST',
@@ -15,7 +19,7 @@ $(document).ready(function () {
             processData: false,
             async: true,
             success: function (result) {
-                update_view(result);
+                update_view(netlist_name, result);
                 $('#submit-netlist').removeAttr("disabled").html("Submit Netlist");
             }
         })
@@ -28,6 +32,9 @@ $(document).ready(function () {
         $('#sample-netlist')
             .attr("disabled", "true")
             .html("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Processing...");
+        $('#no-netlist-provided-span')
+        .removeAttr('hidden')
+        .html("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Processing Netlist");
         var selected_netlist = parseInt($('#sample-netlist-select').val());
         let sample_netlist_file;
         switch(selected_netlist) {
@@ -56,7 +63,7 @@ $(document).ready(function () {
             url: '/dashboard',
             contentType: false,
             success: function (result) {
-                update_view(result);
+                update_view(sample_netlist_file, result);
                 $('#sample-netlist').removeAttr("disabled").html("Use Sample Netlist");
             }
         })
@@ -68,7 +75,7 @@ $(document).ready(function () {
     })
 });
 
-function update_view(result) {
+function update_view(netlist_name, result) {
     var congestion_plot_img = result["img_src"];
     var ld = result["netlist_details"];
     var gridhor = ld["grid_hor"];
@@ -78,6 +85,7 @@ function update_view(result) {
     var netlist_size = ld["netlist_size"];
     $('#no-netlist-provided-span').attr("hidden", "true");
     $('#netlist-details-list').removeAttr("hidden");
+    $('#netlist-name').html("Name: <b>" + netlist_name + "</b>");
     $('#grid-size').html("Grid: " + gridhor + " x " + gridver);
     $('#horcap').html("Horizontal Capacity: " + horcap);
     $('#vercap').html("Vertical Capacity: " + vercap);
