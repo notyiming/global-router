@@ -6,6 +6,7 @@ import click
 from matplotlib import patches, pyplot as plt
 from models.global_router import GlobalRouter
 import web.app as flask_app
+import mpld3
 
 
 @click.group()
@@ -32,6 +33,7 @@ def global_route(input_file: str, output_file: str):
     best_route_overflow = math.inf
     best_wire_length = math.inf
 
+    # TODO: create more global routers, pick the best result
     total_overflow, total_wirelength = global_router.global_route()
 
     best_route_overflow = min(best_route_overflow, total_overflow)
@@ -61,16 +63,17 @@ def gui(port=5000, debug=False):
 
 @gr_cli.command()
 @click.option("-c", "--congestion_data_file_path", help="Congestion data file path", required=True)
-@click.option("-p", "--plot_figure_filepath", help="Plot figure filename", required=True)
 @click.option("-d", "--display_plot_from_cli", is_flag=True, help="Display plot from CLI")
-def plot_congestion(congestion_data_file_path: str, plot_figure_filepath: str, display_plot_from_cli=False):
+def plot_congestion(congestion_data_file_path: str, display_plot_from_cli=False) -> str:
     """Plot congestion data visualization
     \f
 
     Args:
         congestion_data_file_path (str): Congestion data file path 
-        plot_figure_filename (str): Plot figure filename
         display_plot (bool, optional): Display plot from CLI. Defaults to False.
+
+    Returns:
+        str: plot figure html
     """
     fig, ax = plt.subplots(1, 1, figsize=(10, 7.5))
     fig.set_facecolor("black")
@@ -140,10 +143,11 @@ def plot_congestion(congestion_data_file_path: str, plot_figure_filepath: str, d
     )
 
     ax.autoscale_view()
-    plt.savefig(f"{plot_figure_filepath}", dpi=300)
 
     if display_plot_from_cli:
-        plt.show()
+        mpld3.show(fig)
+    
+    return mpld3.fig_to_html(fig)
 
 
 if __name__ == "__main__":

@@ -76,7 +76,7 @@ $(document).ready(function () {
 });
 
 function update_view(netlist_name, result) {
-    var congestion_plot_img = result["img_src"];
+    var congestion_plot_fig_html= result["fig_html"];
     var ld = result["netlist_details"];
     var gridhor = ld["grid_hor"];
     var gridver = ld["grid_ver"];
@@ -90,5 +90,5 @@ function update_view(netlist_name, result) {
     $('#horcap').html("Horizontal Capacity: " + horcap);
     $('#vercap').html("Vertical Capacity: " + vercap);
     $('#netlist-size').html("Netlist Size: " + netlist_size);
-    $('#congestion-plot').attr("src", congestion_plot_img);
+    $('#plot-fig').html(congestion_plot_fig_html);
 }
