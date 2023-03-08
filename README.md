@@ -5,3 +5,4 @@ One of the key features of the Global Router project is its ability to visualize
 
 Overall, the Global Router project is a powerful tool for VLSI designers, providing a fast and efficient way to solve the global routing problem and optimize layout designs. With its advanced features and capabilities, it is a valuable asset for any team working in the field of VLSI design.
 
+Read more in documentation here: http://global-router.rtfd.io/
