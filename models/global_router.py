@@ -2,6 +2,7 @@
 
 import heapq
 import os
+import random
 from typing import List, Tuple
 import click
 from models.net import Net
@@ -247,14 +248,14 @@ class GlobalRouter:
     @util.log_func
     def global_route(self) -> Tuple[int, int]:
         """main global routing logic"""
+        random.shuffle(self.netlist)
+        self.netlist.sort(key=lambda x: x.hpwl)
+
         with click.progressbar(self.netlist, label="Routing the netlist") as netlist:
             for net in netlist:
                 self.route_two_pin_net(net)
                 self.update_demand(net.path, True)
 
-        # get a random seed
-        # shuffle the netlist based on the random seed
-        # sort it again based on hpwl
         total_overflow, total_wirelength = self.update_overflow()
         gr_logger.info(f"Total Overflow: {total_overflow}")
         gr_logger.info(f"Total Wirelength: {total_wirelength}")
