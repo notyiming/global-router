@@ -134,7 +134,10 @@ def dashboard():
 
         result = {}
         file_basename = Path(netlist_file).stem
-        result["netlist_details"] = gr.global_route.callback(netlist_file, f"output/{file_basename}.out")
+        netlist_details, overflow, wirelength = gr.global_route.callback(netlist_file, f"output/{file_basename}.out")
+        result["netlist_details"] = netlist_details
+        result["overflow"] = overflow
+        result["wirelength"] = wirelength
         result["fig_html"] = gr.plot_congestion.callback(f"output/{file_basename}.out.fig")
 
         return jsonify(result)

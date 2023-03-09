@@ -4,9 +4,9 @@
 import math
 import click
 from matplotlib import patches, pyplot as plt
+import mpld3
 from models.global_router import GlobalRouter
 import web.app as flask_app
-import mpld3
 
 
 @click.group()
@@ -44,7 +44,7 @@ def global_route(input_file: str, output_file: str):
 
     global_router.dump_result(output_file)
     global_router.generate_congestion_output(output_file)
-    return netlist_details
+    return (netlist_details, best_route_overflow, best_wire_length)
 
 
 @gr_cli.command()
@@ -75,8 +75,8 @@ def plot_congestion(congestion_data_file_path: str, display_plot_from_cli=False)
     Returns:
         str: plot figure html
     """
-    fig, ax = plt.subplots(1, 1, figsize=(10, 7.5))
-    fig.set_facecolor("black")
+    fig, ax = plt.subplots()
+    ax.set_facecolor("black")
     fig.tight_layout()
     with open(congestion_data_file_path, "r", encoding="utf-8") as data:
         grid_data = data.readline().split()
@@ -123,31 +123,28 @@ def plot_congestion(congestion_data_file_path: str, display_plot_from_cli=False)
                         linestyle='-',
                     ))
     ax.set_aspect('equal', adjustable='box')
-    ax.set_frame_on(False)
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-    legend_elements = [
-        patches.Patch(color="white", label="no use"),
-        patches.Patch(color="blue", label="util <= 0.25"),
-        patches.Patch(color="cyan", label="util <= 0.5"),
-        patches.Patch(color="green", label="util <= 0.75"),
-        patches.Patch(color="yellow", label="util <= 1.0"),
-        patches.Patch(color="red", label="overflow")
-    ]
-    ax.legend(
-        handles=legend_elements,
-        title='Legend',
-        loc='center left',
-        bbox_to_anchor=(1, 0.5),
-        fontsize=8
-    )
-
     ax.autoscale_view()
 
     if display_plot_from_cli:
+        legend_elements = [
+            patches.Patch(color="white", label="no use"),
+            patches.Patch(color="blue", label="util <= 0.25"),
+            patches.Patch(color="cyan", label="util <= 0.5"),
+            patches.Patch(color="green", label="util <= 0.75"),
+            patches.Patch(color="yellow", label="util <= 1.0"),
+            patches.Patch(color="red", label="overflow")
+        ]
+        ax.legend(
+            handles=legend_elements,
+            title='Legend',
+            loc='center left',
+            bbox_to_anchor=(1, 0.5),
+        )
+        plt.show()
         mpld3.show(fig)
-    
-    return mpld3.fig_to_html(fig)
+
+    plot_count = 1
+    return mpld3.fig_to_html(fig, no_extras=True, figid=f"plot-{plot_count}")
 
 
 if __name__ == "__main__":

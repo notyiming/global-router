@@ -83,6 +83,8 @@ function update_view(netlist_name, result) {
     var vercap = ld["ver_cap"];
     var horcap = ld["hor_cap"];
     var netlist_size = ld["netlist_size"];
+    var overflow = result["overflow"];
+    var wirelength = result["wirelength"];
     $('#no-netlist-provided-span').attr("hidden", "true");
     $('#netlist-details-list').removeAttr("hidden");
     $('#netlist-name').html("Name: <b>" + netlist_name + "</b>");
@@ -90,5 +92,8 @@ function update_view(netlist_name, result) {
     $('#horcap').html("Horizontal Capacity: " + horcap);
     $('#vercap').html("Vertical Capacity: " + vercap);
     $('#netlist-size').html("Netlist Size: " + netlist_size);
+    $('#overflow').html("Overflow: " + overflow);
+    $('#wirelength').html("Wirelength: " + wirelength);
     $('#plot-fig').html(congestion_plot_fig_html);
+    $('#plot-1').css({"text-align": "center"});
 }
