@@ -93,6 +93,8 @@ def plot_congestion(congestion_data_file_path: str, display_plot_from_cli=False)
     fig, ax = plt.subplots()
     ax.set_facecolor("black")
     fig.tight_layout()
+    plt.xticks([])
+    plt.yticks([])
     with open(congestion_data_file_path, "r", encoding="utf-8") as data:
         grid_data = data.readline().split()
         grid_hor = int(grid_data[0])
@@ -156,7 +158,6 @@ def plot_congestion(congestion_data_file_path: str, display_plot_from_cli=False)
             bbox_to_anchor=(1, 0.5),
         )
         plt.show()
-        mpld3.show(fig)
 
     plot_count = 1
     return mpld3.fig_to_html(fig, no_extras=True, figid=f"plot-{plot_count}")
