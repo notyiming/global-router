@@ -23,6 +23,8 @@ class GlobalRouter:
         self.netlist: List[Net] = []
         self.number_of_nodes: int = 0
         self.number_of_edges: int = 0
+        self.overflow: int = 0
+        self.wirelength: int = 0
         self.number_of_horizontal_edges: int = 0
         self.demand: List[float] = []
 
@@ -246,7 +248,7 @@ class GlobalRouter:
 
     @util.timeit
     @util.log_func
-    def global_route(self) -> Tuple[int, int]:
+    def global_route(self):
         """main global routing logic"""
         random.shuffle(self.netlist)
         self.netlist.sort(key=lambda x: x.hpwl)
@@ -259,8 +261,8 @@ class GlobalRouter:
         total_overflow, total_wirelength = self.update_overflow()
         gr_logger.info(f"Total Overflow: {total_overflow}")
         gr_logger.info(f"Total Wirelength: {total_wirelength}")
-
-        return total_overflow, total_wirelength
+        self.overflow = total_overflow
+        self.wirelength = total_wirelength
 
     def generate_congestion_output(self, output_file_name: str) -> None:
         """Generate the congestion data for the output

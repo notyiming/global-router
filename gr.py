@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Global Router Commands"""
 
+import copy
 import math
 import click
+import multiprocessing
 from matplotlib import patches, pyplot as plt
 import mpld3
 from models.global_router import GlobalRouter
@@ -29,23 +31,37 @@ def global_route(input_file: str, output_file: str):
     netlist_details = global_router.parse_input(input_file)
     global_router.show_netlist_info()
 
-    # best_route_index = 0
-    best_route_overflow = math.inf
+    num_threads = 3
+    global_routers: list[GlobalRouter] = []
+    for _ in range(num_threads):
+        router_copy = copy.deepcopy(global_router)
+        global_routers.append(router_copy)
+
+    best_gr_index = 0
+    best_gr_overflow = math.inf
     best_wire_length = math.inf
 
-    # TODO: create more global routers, pick the best result
-    total_overflow, total_wirelength = global_router.global_route()
+    # create more global routers, pick the best result
+    with multiprocessing.Pool(num_threads) as p:
+        global_routers = p.map(_run_global_route, global_routers)
 
-    best_route_overflow = min(best_route_overflow, total_overflow)
-    best_wire_length = min(best_wire_length, total_wirelength)
+    for i in range(num_threads):
+        if global_routers[i].overflow <= best_gr_overflow:
+            if global_routers[i].wirelength < best_wire_length:
+                best_gr_overflow = global_routers[i].overflow
+                best_wire_length = global_routers[i].wirelength
+                best_gr_index = i
 
-    if best_route_overflow > 0:
-        global_router.rip_up_and_reroute()
+    if best_gr_overflow > 0:
+        global_routers[best_gr_index].rip_up_and_reroute()
 
-    global_router.dump_result(output_file)
-    global_router.generate_congestion_output(output_file)
-    return (netlist_details, best_route_overflow, best_wire_length)
+    global_routers[best_gr_index].dump_result(output_file)
+    global_routers[best_gr_index].generate_congestion_output(output_file)
+    return (netlist_details, best_gr_overflow, best_wire_length)
 
+def _run_global_route(router: GlobalRouter):
+    router.global_route()
+    return router
 
 @gr_cli.command()
 @click.option("-p", "--port", help="Port Selection", type=int)
@@ -59,7 +75,6 @@ def gui(port=5000, debug=False):
         debug (bool, optional): Debug flag. Defaults to False.
     """
     flask_app.app.run(port=port, debug=debug)
-
 
 @gr_cli.command()
 @click.option("-c", "--congestion_data_file_path", help="Congestion data file path", required=True)
