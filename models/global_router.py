@@ -264,7 +264,7 @@ class GlobalRouter:
         self.overflow = total_overflow
         self.wirelength = total_wirelength
 
-    def generate_congestion_output(self, output_file_name: str) -> None:
+    def generate_congestion_output(self, output_file_name: str):
         """Generate the congestion data for the output
 
         Args:
@@ -284,7 +284,7 @@ class GlobalRouter:
             gr_logger.info(f"Congestion data generated into {output_file_name}.fig")
 
     @util.log_func
-    def parse_input(self, input_file_path: str):
+    def parse_input(self, input_file_path: str) -> list[Net]:
         """Parse the netlist input file
 
         Args:
