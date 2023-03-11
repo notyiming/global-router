@@ -31,7 +31,7 @@ def global_route(input_file: str, output_file: str):
     netlist_details = global_router.parse_input(input_file)
     global_router.show_netlist_info()
 
-    num_threads = 3
+    num_threads = 5
     global_routers: list[GlobalRouter] = []
     for _ in range(num_threads):
         router_copy = copy.deepcopy(global_router)
@@ -46,11 +46,11 @@ def global_route(input_file: str, output_file: str):
         global_routers = p.map(_run_global_route, global_routers)
 
     for i in range(num_threads):
-        if global_routers[i].overflow <= best_gr_overflow:
-            if global_routers[i].wirelength < best_wire_length:
-                best_gr_overflow = global_routers[i].overflow
-                best_wire_length = global_routers[i].wirelength
-                best_gr_index = i
+        router = global_routers[i]
+        if router.overflow < best_gr_overflow or (router.overflow == best_gr_overflow and router.wirelength < best_wire_length):
+            best_gr_overflow = router.overflow
+            best_wire_length = router.wirelength
+            best_gr_index = i
 
     if best_gr_overflow > 0:
         global_routers[best_gr_index].rip_up_and_reroute()
