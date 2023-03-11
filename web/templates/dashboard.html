@@ -89,10 +89,38 @@
     <div class="col-xl-8 p-4">
       <div class="card mb-3">
         <div class="card-header">
-          <h3 class="text-muted">Congestion Visualization</h3>
+          <h3 class="text-muted me-auto">Congestion Visualization</h3>
         </div>
-        <div class="card-body">
-          <div id="plot-fig"></div>
+        <div class="card-body row">
+          <div id="plot-fig" class="col-xl-8"></div>
+          <div class="col-xl-4">
+            <ul class="legend mt-2">
+              <li>
+                <div class="legend-color" style="background-color: white;"></div>
+                <span class="label">No Use</span>
+              </li>
+              <li>
+                <div class="legend-color" style="background-color: blue;"></div>
+                <span class="label">Util <= 0.25</span>
+              </li>
+              <li>
+                <div class="legend-color" style="background-color: cyan;"></div>
+                <span class="label">Util <= 0.5</span>
+              </li>
+              <li>
+                <div class="legend-color" style="background-color: green;"></div>
+                <span class="label">Util <= 0.75</span>
+              </li>
+              <li>
+                <div class="legend-color" style="background-color: yellow;"></div>
+                <span class="label">Util <= 1.0</span>
+              </li>
+              <li>
+                <div class="legend-color" style="background-color: red;"></div>
+                <span class="label">Overflow</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

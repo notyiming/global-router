@@ -7,6 +7,32 @@
     backdrop-filter: saturate(200%) blur(25px);
 }
 
-body{
+body {
     background-color: #eee;
+}
+
+.legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.legend li {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
+
+.legend li .legend-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border-radius: 50%;
+    border: gray solid 1px;
+}
+
+.legend li .label {
+    font-size: 14px;
+    font-weight: bold;
 }
