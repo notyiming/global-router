@@ -159,8 +159,7 @@ def plot_congestion(congestion_data_file_path: str, display_plot_from_cli=False)
         )
         plt.show()
 
-    plot_count = 1
-    return mpld3.fig_to_html(fig, no_extras=True, figid=f"plot-{plot_count}")
+    return mpld3.fig_to_html(fig, no_extras=True)
 
 
 if __name__ == "__main__":
