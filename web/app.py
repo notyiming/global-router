@@ -120,11 +120,9 @@ def dashboard():
 
         else:
             if "inputFile" not in request.files:
-                flash("No file part", "error")
                 return redirect("/dashboard")
             file = request.files["inputFile"]
             if not file.filename:
-                flash("No selected file", "error")
                 return redirect("/dashboard")
             if file and _allowed_file(file.filename):
                 filename = secure_filename(file.filename)
