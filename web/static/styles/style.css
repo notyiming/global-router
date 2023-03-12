@@ -11,38 +11,6 @@ body {
     background-color: #eee;
 }
 
-.legend {
-    display: flex;
-    align-items: center;
-    min-height: 300px;
-}
-
-.legend ul{
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.legend li {
-    display: flex;
-    align-items: center;
-    margin-right: 20px;
-    margin-bottom: 10px;
-}
-
-.legend li .legend-color {
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-    border-radius: 50%;
-    border: gray solid 1px;
-}
-
-.legend li .label {
-    font-size: 14px;
-    font-weight: bold;
-}
-
 .diagonal-text {
     min-height: 300px;
     position: relative;
@@ -54,4 +22,14 @@ body {
     left: 50%;
     transform: translate(-50%, -50%) rotate(-45deg);
     color: rgb(175, 175, 175);
+}
+
+.tab-pane div {
+    text-align: center;
+}
+
+#netlist-output-details{
+    display: flex;
+    align-items: center;
+    text-align: left;
 }
