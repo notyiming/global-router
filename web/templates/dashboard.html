@@ -59,8 +59,7 @@
               <option value="4">IBM03</option>
               <option value="5">IBM04</option>
             </select>
-            <button type="button" id="sample-netlist" disabled class="input-group-text btn btn-primary mb-3">Select
-              Netlist</button>
+            <button type="button" id="sample-netlist" class="input-group-text btn btn-primary mb-3" disabled>Submit Netlist</button>
           </div>
         </div>
       </div>
@@ -69,7 +68,19 @@
         <div class="card-header">
           <h3 class="text-muted">Job Monitor</h3>
         </div>
-        <div class="card-body">
+        <div class="card-body" id="job-monitor-table-body">
+          <table class="table" id="job-monitor">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Status</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

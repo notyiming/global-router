@@ -1,14 +1,13 @@
+var netlist_count = 0;
+var result_list = [];
+
 $(document).ready(function () {
+
     $('#netlist-input-form').on('submit', function (e) {
-        $('#congestion-plot').attr("alt", "Generating Congestion Plot...").attr("src", "");
-        $('#submit-netlist')
-            .attr("disabled", "true")
-            .html("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Processing...");
-        $('#no-netlist-provided-span')
-            .removeAttr('hidden')
-            .html("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Processing Netlist");
         var netlist_input_data = new FormData($('#netlist-input-form')[0]);
         var netlist_name = $('#inputFile')[0].files[0].name;
+        var curr_count = ++netlist_count;
+        update_job_monitor(netlist_name, curr_count);
         $.ajax({
             data: netlist_input_data,
             type: 'POST',
@@ -18,22 +17,13 @@ $(document).ready(function () {
             processData: false,
             async: true,
             success: function (result) {
-                $('#submit-netlist').removeAttr("disabled").html("Submit Netlist");
-                id = add_tab(result["fig_html"]);
-                update_view(netlist_name, result, id);
+                ready_job_state(curr_count);
             }
         })
         e.preventDefault();
     });
 
     $('#sample-netlist').on('click', function (e) {
-        $('#congestion-plot').attr("alt", "Generating Congestion Plot...").attr("src", "");
-        $('#sample-netlist')
-            .attr("disabled", "true")
-            .html("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Processing...");
-        $('#no-netlist-provided-span')
-            .removeAttr('hidden')
-            .html("<span class='spinner-border spinner-border-sm' role='status' aria-hidden='true'></span> Processing Netlist");
         var selected_netlist = parseInt($('#sample-netlist-select').val());
         let sample_netlist_file;
         switch (selected_netlist) {
@@ -56,15 +46,16 @@ $(document).ready(function () {
                 sample_netlist_file = "example.txt";
                 break;
         }
+        var curr_count = ++netlist_count;
+        update_job_monitor(sample_netlist_file, curr_count);
         $.ajax({
             data: 'testcase/' + sample_netlist_file,
             type: 'POST',
             url: '/dashboard',
             contentType: false,
             success: function (result) {
-                $('#sample-netlist').removeAttr("disabled").html("Select Netlist");
-                id = add_tab(result["fig_html"]);
-                update_view(sample_netlist_file, result, id);
+                ready_job_state(curr_count);
+                result_list.push({sample_netlist_file, result});
             }
         })
         e.preventDefault();
@@ -74,6 +65,11 @@ $(document).ready(function () {
         $('#sample-netlist').removeAttr('disabled');
     })
 });
+
+function ready_job_state(id) {
+    $("#netlist-" + id).find("td button").removeAttr("disabled");
+    $("#netlist-" + id + " .routing-status").text("Ready").css("color", "green");
+}
 
 function update_view(netlist_name, result, id) {
     var ld = result["netlist_details"];
@@ -94,20 +90,42 @@ function update_view(netlist_name, result, id) {
     $('#wirelength-' + id).html("Wirelength: " + wirelength);
 }
 
+function view_visual(id) {
+    netlist = result_list[id-1]
+    netlist_name = netlist.sample_netlist_file;
+    netlist_data = netlist.result;
+    plot_id = add_tab(netlist_data["fig_html"]);
+    update_view(netlist_name, netlist_data, plot_id);
+
+}
+
+function update_job_monitor(netlist_name, netlist_count) {
+    var jobMonitor = $('#job-monitor');
+    var newRowId = "netlist-" + netlist_count;
+    var newRow = '<tr id=' + newRowId + '><th scope="row">' + netlist_count + '</th>'
+    newRow += ('<td>' + netlist_name + '</td>');
+    newRow += ('<td class="routing-status">' + 'Routing' + '</td>');
+    newRow += ('<td><button class="btn btn-primary" onclick="view_visual(' + netlist_count + ')" disabled>View</button></td>');
+    jobMonitor.append(newRow);
+}
+
 function add_tab(fig_html) {
     var numTabs = $('#netlist-tabs li').length;
     var newTabId = 'tab-' + numTabs;
+    var newTabContentHtml = '<div class="tab-pane fade" id="' + newTabId + '" role="tabpanel" aria-labelledby="' + newTabId + '-tab">' + '<div class="row"><div id="plot-view" class="col-xl-8">' + fig_html + '</div>' + '<div class="col-xl-4 " id="netlist-output-details">' + '<span><h5>Netlist Details</h5><ul id="netlist-details-list"><li id="netlist-name-' + numTabs + '"></li><li id="grid-size-' + numTabs + '"></li><li id="horcap-' + numTabs + '"></li><li id="vercap-' + numTabs + '"></li><li id="netlist-size-' + numTabs + '"></li><li id="overflow-' + numTabs + '"></li><li id="wirelength-' + numTabs + '"></li></ul></span></div></div>';
+    var newTabHtml = '<li class="nav-item" role="presentation"><button class="nav-link" id="' + newTabId + '-tab" data-bs-toggle="pill" data-bs-target="#' + newTabId + '" type="button" role="tab" aria-controls="' + newTabId + '" aria-selected="false">Plot-' + numTabs + '</button></li>';
     if (numTabs === 0) {
-        var netlistTabsUL = '<ul class="nav nav-pills mb-3" id="netlist-tabs" role="tablist"></ul><div class="tab-content" id="netlist-tabs-content"></div>';
-        var newTabContentHtml = '<div class="tab-pane fade show active" id="' + newTabId + '" role="tabpanel" aria-labelledby="' + newTabId + '-tab">' + '<div class="card-body row" id="output-view"><div id="plot-view" class="col-xl-8">' + fig_html + '</div>' + '<div class="col-xl-4 " id="netlist-output-details">' + '<span><h5>Netlist Details</h5><ul id="netlist-details-list"><li id="netlist-name-' + numTabs + '"></li><li id="grid-size-' + numTabs + '"></li><li id="horcap-' + numTabs + '"></li><li id="vercap-' + numTabs + '"></li><li id="netlist-size-' + numTabs + '"></li><li id="overflow-' + numTabs + '"></li><li id="wirelength-' + numTabs + '"></li></ul></span></div></div>';
-        var newTabHtml = '<li class="nav-item" role="presentation"><button class="nav-link active" id="' + newTabId + '-tab" data-bs-toggle="pill" data-bs-target="#' + newTabId + '" type="button" role="tab" aria-controls="' + newTabId + '" aria-selected="true">New Tab</button></li>';
+        var netlistTabsUL = '<ul class="nav nav-pills mb-3" id="netlist-tabs" role="tablist"></ul>'
+        netlistTabsUL += '<div class="tab-content" id="netlist-tabs-content"></div>';
+        $('#output-view').removeClass('row');
         $('#output-view').html(netlistTabsUL);
+        $('#netlist-tabs').append(newTabHtml);
+        $('#netlist-tabs-content').append(newTabContentHtml);
+        $('#' + newTabId).addClass('show active');
+        $('#' + newTabId + '-tab').addClass('active');
     } else {
-        var newTabContentHtml = '<div class="tab-pane fade" id="' + newTabId + '" role="tabpanel" aria-labelledby="' + newTabId + '-tab">' + fig_html + '</div>';
-        var newTabContentHtml = '<div class="tab-pane fade" id="' + newTabId + '" role="tabpanel" aria-labelledby="' + newTabId + '-tab">' + '<div class="card-body row" id="output-view"><div id="plot-view" class="col-xl-8">' + fig_html + '</div>' + '<div class="col-xl-4 " id="netlist-output-details">' + '<span><h5>Netlist Details</h5><ul id="netlist-details-list"><li id="netlist-name-' + numTabs + '"></li><li id="grid-size-' + numTabs + '"></li><li id="horcap-' + numTabs + '"></li><li id="vercap-' + numTabs + '"></li><li id="netlist-size-' + numTabs + '"></li><li id="overflow-' + numTabs + '"></li><li id="wirelength-' + numTabs + '"></li></ul></span></div></div>';
-        var newTabHtml = '<li class="nav-item" role="presentation"><button class="nav-link" id="' + newTabId + '-tab" data-bs-toggle="pill" data-bs-target="#' + newTabId + '" type="button" role="tab" aria-controls="' + newTabId + '" aria-selected="false">New Tab</button></li>';
+        $('#netlist-tabs').append(newTabHtml);
+        $('#netlist-tabs-content').append(newTabContentHtml);
     }
-    $('#netlist-tabs').append(newTabHtml);
-    $('#netlist-tabs-content').append(newTabContentHtml);
     return numTabs;
 }

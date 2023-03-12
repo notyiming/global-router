@@ -33,3 +33,16 @@ body {
     align-items: center;
     text-align: left;
 }
+
+.routing-status{
+    color: orange;
+}
+
+tbody td, tbody th {
+    vertical-align: middle;
+}
+
+#job-monitor-table-body{
+    max-height: 400px;
+    overflow: scroll;
+}
