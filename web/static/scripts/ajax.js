@@ -94,8 +94,9 @@ function view_visual(id) {
     netlist = result_list[id - 1]
     netlist_name = netlist.sample_netlist_file;
     netlist_data = netlist.result;
-    plot_id = add_tab(netlist_data["fig_html"]);
-    update_view(netlist_name, netlist_data, plot_id);
+    $("#netlist-" + id).find("td button").attr("disabled", "disabled").text("Opened");
+    add_tab(netlist_data["fig_html"], id);
+    update_view(netlist_name, netlist_data, id);
 }
 
 function update_job_monitor(netlist_name, netlist_count) {
@@ -108,8 +109,8 @@ function update_job_monitor(netlist_name, netlist_count) {
     jobMonitor.append(newRow);
 }
 
-function add_tab(figHtml) {
-    const numTabs = $('#netlist-tabs li').length;
+function add_tab(figHtml, id) {
+    var numTabs = id;
     const newTabId = `tab-${numTabs}`;
     const newTabContentHtml = `
     <div class="tab-pane fade" id="${newTabId}" role="tabpanel" aria-labelledby="${newTabId}-tab">
@@ -135,7 +136,7 @@ function add_tab(figHtml) {
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="${newTabId}-tab" data-bs-toggle="pill" data-bs-target="#${newTabId}" type="button" role="tab" aria-controls="${newTabId}" aria-selected="false">Plot-${numTabs}</button>
     </li>`;
-    if (numTabs === 0) {
+    if (numTabs === 1) {
         const netlistTabsUL = `
       <ul class="nav nav-pills mb-3" id="netlist-tabs" role="tablist"></ul>
       <div class="tab-content" id="netlist-tabs-content"></div>`;
@@ -149,5 +150,4 @@ function add_tab(figHtml) {
         $('#netlist-tabs').append(newTabHtml);
         $('#netlist-tabs-content').append(newTabContentHtml);
     }
-    return numTabs;
 }
