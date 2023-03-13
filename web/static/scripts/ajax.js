@@ -55,7 +55,7 @@ $(document).ready(function () {
             contentType: false,
             success: function (result) {
                 ready_job_state(curr_count);
-                result_list.push({sample_netlist_file, result});
+                result_list.push({ sample_netlist_file, result });
             }
         })
         e.preventDefault();
@@ -91,12 +91,11 @@ function update_view(netlist_name, result, id) {
 }
 
 function view_visual(id) {
-    netlist = result_list[id-1]
+    netlist = result_list[id - 1]
     netlist_name = netlist.sample_netlist_file;
     netlist_data = netlist.result;
     plot_id = add_tab(netlist_data["fig_html"]);
     update_view(netlist_name, netlist_data, plot_id);
-
 }
 
 function update_job_monitor(netlist_name, netlist_count) {
@@ -109,14 +108,37 @@ function update_job_monitor(netlist_name, netlist_count) {
     jobMonitor.append(newRow);
 }
 
-function add_tab(fig_html) {
-    var numTabs = $('#netlist-tabs li').length;
-    var newTabId = 'tab-' + numTabs;
-    var newTabContentHtml = '<div class="tab-pane fade" id="' + newTabId + '" role="tabpanel" aria-labelledby="' + newTabId + '-tab">' + '<div class="row"><div id="plot-view" class="col-xl-8">' + fig_html + '</div>' + '<div class="col-xl-4 " id="netlist-output-details">' + '<span><h5>Netlist Details</h5><ul id="netlist-details-list"><li id="netlist-name-' + numTabs + '"></li><li id="grid-size-' + numTabs + '"></li><li id="horcap-' + numTabs + '"></li><li id="vercap-' + numTabs + '"></li><li id="netlist-size-' + numTabs + '"></li><li id="overflow-' + numTabs + '"></li><li id="wirelength-' + numTabs + '"></li></ul></span></div></div>';
-    var newTabHtml = '<li class="nav-item" role="presentation"><button class="nav-link" id="' + newTabId + '-tab" data-bs-toggle="pill" data-bs-target="#' + newTabId + '" type="button" role="tab" aria-controls="' + newTabId + '" aria-selected="false">Plot-' + numTabs + '</button></li>';
+function add_tab(figHtml) {
+    const numTabs = $('#netlist-tabs li').length;
+    const newTabId = `tab-${numTabs}`;
+    const newTabContentHtml = `
+    <div class="tab-pane fade" id="${newTabId}" role="tabpanel" aria-labelledby="${newTabId}-tab">
+      <div class="row">
+        <div id="plot-view" class="col-xl-8">${figHtml}</div>
+        <div class="col-xl-4" id="netlist-output-details">
+          <span>
+            <h5>Netlist Details</h5>
+            <ul id="netlist-details-list">
+              <li id="netlist-name-${numTabs}"></li>
+              <li id="grid-size-${numTabs}"></li>
+              <li id="horcap-${numTabs}"></li>
+              <li id="vercap-${numTabs}"></li>
+              <li id="netlist-size-${numTabs}"></li>
+              <li id="overflow-${numTabs}"></li>
+              <li id="wirelength-${numTabs}"></li>
+            </ul>
+          </span>
+        </div>
+      </div>
+    </div>`;
+    const newTabHtml = `
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="${newTabId}-tab" data-bs-toggle="pill" data-bs-target="#${newTabId}" type="button" role="tab" aria-controls="${newTabId}" aria-selected="false">Plot-${numTabs}</button>
+    </li>`;
     if (numTabs === 0) {
-        var netlistTabsUL = '<ul class="nav nav-pills mb-3" id="netlist-tabs" role="tablist"></ul>'
-        netlistTabsUL += '<div class="tab-content" id="netlist-tabs-content"></div>';
+        const netlistTabsUL = `
+      <ul class="nav nav-pills mb-3" id="netlist-tabs" role="tablist"></ul>
+      <div class="tab-content" id="netlist-tabs-content"></div>`;
         $('#output-view').removeClass('row');
         $('#output-view').html(netlistTabsUL);
         $('#netlist-tabs').append(newTabHtml);
