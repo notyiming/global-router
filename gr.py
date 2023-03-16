@@ -59,9 +59,11 @@ def global_route(input_file: str, output_file: str):
     global_routers[best_gr_index].generate_congestion_output(output_file)
     return (netlist_details, best_gr_overflow, best_wire_length)
 
+
 def _run_global_route(router: GlobalRouter):
     router.global_route()
     return router
+
 
 @gr_cli.command()
 @click.option("-p", "--port", help="Port Selection", type=int)
@@ -75,6 +77,7 @@ def gui(port=5000, debug=False):
         debug (bool, optional): Debug flag. Defaults to False.
     """
     flask_app.app.run(port=port, debug=debug)
+
 
 @gr_cli.command()
 @click.option("-c", "--congestion_data_file_path", help="Congestion data file path", required=True)
