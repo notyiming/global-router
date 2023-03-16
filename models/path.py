@@ -12,7 +12,6 @@ class Path:
         self.coordinates_list: Deque[Tuple[int, int]] = deque()
         self.end_node: Node = end_node
         self.edge_id_list: Deque[int] = deque()
-        self.cost: float = self.end_node.cost
 
         current_grid = self.end_node
 
