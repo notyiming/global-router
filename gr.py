@@ -8,6 +8,7 @@ import multiprocessing
 from matplotlib import patches, pyplot as plt
 import mpld3
 from models.global_router import GlobalRouter
+from logs.gr_logger import gr_logger
 import web.app as flask_app
 
 
@@ -17,8 +18,8 @@ def gr_cli():
 
 
 @gr_cli.command(short_help="Route the netlist")
-@click.option("-i", "--input_file", help="Path to netlist input file", required=True)
-@click.option("-o", "--output_file", help="Path to generated output file", required=True)
+@click.argument("input_file")
+@click.argument("output_file")
 def global_route(input_file: str, output_file: str):
     """Global Route a netlist file and generate a routed output
     \f
@@ -41,6 +42,8 @@ def global_route(input_file: str, output_file: str):
     best_gr_overflow = math.inf
     best_wire_length = math.inf
 
+    gr_logger.info(f"Number of Global Routers in parallel: {num_threads}")
+
     # create more global routers, pick the best result
     with multiprocessing.Pool(num_threads) as p:
         global_routers = p.map(_run_global_route, global_routers)
@@ -51,6 +54,11 @@ def global_route(input_file: str, output_file: str):
             best_gr_overflow = router.overflow
             best_wire_length = router.wirelength
             best_gr_index = i
+    gr_logger.info("===================================")
+    gr_logger.info(f"Best Router Index: {best_gr_index}")
+    gr_logger.info(f"Best Overflow: {best_gr_overflow}")
+    gr_logger.info(f"Best Wirelength: {best_wire_length}")
+    gr_logger.info("===================================")
 
     if best_gr_overflow > 0:
         global_routers[best_gr_index].rip_up_and_reroute()
@@ -80,7 +88,7 @@ def gui(port=5000, debug=False):
 
 
 @gr_cli.command()
-@click.option("-c", "--congestion_data_file_path", help="Congestion data file path", required=True)
+@click.argument("congestion_data_file_path")
 @click.option("-d", "--display_plot_from_cli", is_flag=True, help="Display plot from CLI")
 def plot_congestion(congestion_data_file_path: str, display_plot_from_cli=False) -> str:
     """Plot congestion data visualization
