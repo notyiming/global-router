@@ -21,6 +21,7 @@ class GlobalRouter:
         self.vertical_capacity: int = 0
         self.horizontal_capacity: int = 0
         self.netlist: List[Net] = []
+        self.number_of_nodes: int = 0
         self.number_of_edges: int = 0
         self.overflow: int = 0
         self.wirelength: int = 0
@@ -110,8 +111,19 @@ class GlobalRouter:
             return False
         return True
 
-    def calculate_edge_id_to_next_node(self, coordinate: Tuple[int, int], direction: int) -> int:
-        """Get ID of the edge to the next node, given the direction
+    def get_node_id(self, coordinate: Tuple[int, int]) -> int:
+        """Get ID of the node
+
+        Args:
+            coordinate (Tuple[int, int]): the coordinate of the node
+
+        Returns:
+            int: the ID of the node
+        """
+        return self.grid_horizontal_size * coordinate[1] + coordinate[0]
+
+    def get_edge_id(self, coordinate: Tuple[int, int], direction: int) -> int:
+        """Get ID of the edge
 
         Args:
             coordinate (Tuple[int, int]): coordinate of the node
@@ -132,6 +144,20 @@ class GlobalRouter:
             case 3:
                 return (self.grid_horizontal_size - 1) * coordinate[1] + (coordinate[0] - 1)
 
+    def get_edge_cost(self, edge_id: int) -> float:
+        """Get the cost of the edge
+
+        Args:
+            edge_id (int): Edge ID
+
+        Returns:
+            float: cost of the edge
+        """
+        capacity = self.horizontal_capacity if edge_id < self.number_of_horizontal_edges else self.vertical_capacity
+        if self.demand[edge_id] < capacity:
+            return 1.0 + (self.demand[edge_id] + 1) / capacity
+        return 1e4
+
     def route_two_pin_net(self, net: Net):
         """Route a two-pin net (BFS)
 
@@ -142,14 +168,13 @@ class GlobalRouter:
         end_pin = net.net_pins_coordinates[1]
 
         node = Node(None, start_pin)
-        node.set_node_id(self.grid_horizontal_size)
+        node.node_id = self.get_node_id(node.coordinates)
 
         priority_queue = []
         heapq.heapify(priority_queue)
         heapq.heappush(priority_queue, node)
 
-        total_number_of_nodes = self.grid_horizontal_size * self.grid_vertical_size
-        node_used = [False] * total_number_of_nodes
+        node_used = [False] * self.number_of_nodes
         best_path = None
 
         while priority_queue:
@@ -170,15 +195,17 @@ class GlobalRouter:
                     continue
                 next_node = Node(current_node, next_coordinate)
 
-                next_node.edge_id = self.calculate_edge_id_to_next_node(
+                # set edge ID
+                next_node.edge_id = self.get_edge_id(
                     current_node.coordinates, i)
 
-                next_node.set_node_id(self.grid_horizontal_size)
+                # set node ID
+                next_node.node_id = self.get_node_id(
+                    next_node.coordinates)  # or next_coordinates?
 
-                next_node.cost = current_node.cost + next_node.calculate_cost(
-                    (self.demand, self.horizontal_capacity,
-                     self.vertical_capacity, self.number_of_horizontal_edges)
-                )
+                # set cost
+                next_node.cost = current_node.cost + \
+                    self.get_edge_cost(next_node.edge_id)
 
                 heapq.heappush(priority_queue, next_node)
 
@@ -223,23 +250,19 @@ class GlobalRouter:
     @util.log_func
     def global_route(self):
         """main global routing logic"""
-
-        # randomizing netlist order
         random.shuffle(self.netlist)
-
-        # sorting netlist by the half perimeter wirelength(L or 7 wirelengths)
         self.netlist.sort(key=lambda x: x.hpwl)
 
-        # looping through the netlist and route each of the nets
         with click.progressbar(self.netlist, label="Routing the netlist") as netlist:
             for net in netlist:
                 self.route_two_pin_net(net)
                 self.update_demand(net.path, True)
 
-        # retrieving the total overflow and wirelength values
-        self.total_overflow, self.total_wirelength = self.update_overflow()
-        gr_logger.info(f"Total Overflow: {self.total_overflow}")
-        gr_logger.info(f"Total Wirelength: {self.total_wirelength}")
+        total_overflow, total_wirelength = self.update_overflow()
+        gr_logger.info(f"Total Overflow: {total_overflow}")
+        gr_logger.info(f"Total Wirelength: {total_wirelength}")
+        self.overflow = total_overflow
+        self.wirelength = total_wirelength
 
     def generate_congestion_output(self, output_file_name: str):
         """Generate the congestion data for the output
@@ -258,8 +281,7 @@ class GlobalRouter:
                 output.write(
                     f"{self.demand[i]/(self.horizontal_capacity if i < self.number_of_horizontal_edges else self.vertical_capacity)} "
                 )
-            gr_logger.info(
-                f"Congestion data generated into {output_file_name}.fig")
+            gr_logger.info(f"Congestion data generated into {output_file_name}.fig")
 
     @util.log_func
     def parse_input(self, input_file_path: str) -> list[Net]:
@@ -281,42 +303,30 @@ class GlobalRouter:
             self.vertical_capacity = int(file.readline().split()[2])
             self.horizontal_capacity = int(file.readline().split()[2])
             netlist_size = int(file.readline().split()[2])
-
-            # looping through the netlist
             for _ in range(netlist_size):
                 net_info = file.readline().split()
                 net_name = net_info[0]
                 net_id = int(net_info[1])
                 num_of_pins = int(net_info[2])
                 net_pins = []
-
-                # looping through the pins of a net
                 for _ in range(num_of_pins):
                     net_pin = file.readline().split()
                     net_pin_x = int(net_pin[0])
                     net_pin_y = int(net_pin[1])
                     net_pins.append((net_pin_x, net_pin_y))
-
-                # populating netlist with Net objects
-                self.netlist.append(
-                    Net(net_id, net_name, num_of_pins, net_pins))
-
-            gr_logger.info(
-                f"{input_file_path} parsed successfully, netlist created")
-
+                net = Net(net_id, net_name, num_of_pins, net_pins)
+                self.netlist.append(net)
             self.number_of_nodes = self.grid_horizontal_size * self.grid_vertical_size
             self.number_of_horizontal_edges = (
                 self.grid_horizontal_size - 1
             ) * self.grid_vertical_size
-
-            # total number of edges = total hor edges + total ver edges
             self.number_of_edges = (
                 self.number_of_horizontal_edges
                 + (self.grid_vertical_size - 1) * self.grid_horizontal_size
             )
-
-            # initializing the demands to all 0s
             self.demand = [0] * self.number_of_edges
+            gr_logger.info(
+                f"{input_file_path} parsed successfully, data structures created")
             netlist_details = {}
             netlist_details["grid_hor"] = self.grid_horizontal_size
             netlist_details["grid_ver"] = self.grid_vertical_size
@@ -324,3 +334,18 @@ class GlobalRouter:
             netlist_details["hor_cap"] = self.horizontal_capacity
             netlist_details["netlist_size"] = netlist_size
             return netlist_details
+
+    def is_overflow(self, path: Path) -> bool:
+        """Determines if overflow exists for a path
+
+        Args:
+            path (Path): layout path
+
+        Returns:
+            bool: layout has overflow
+        """
+        for edge_id in path.edge_id_list:
+            if self.demand[edge_id] > self.horizontal_capacity \
+                    if edge_id < self.number_of_horizontal_edges else self.vertical_capacity:
+                return True
+        return False
