@@ -21,12 +21,13 @@ class GlobalRouter:
         self.vertical_capacity: int = 0
         self.horizontal_capacity: int = 0
         self.netlist: List[Net] = []
-        self.number_of_nodes: int = 0
+        self.number_of_nodes: int = 0  # total number of cells in the grid
         self.number_of_edges: int = 0
-        self.overflow: int = 0
-        self.wirelength: int = 0
+        self.overflow: int = 0  # total number of overflow in the layout
+        self.max_overflow: int = 0  # max total number of overflow in any edge
+        self.wirelength: int = 0  # total wirelength in the layout
         self.number_of_horizontal_edges: int = 0
-        self.demand: List[float] = []
+        self.demand: List[float] = []  # the demand of each edge (ver and hor)
 
     @util.log_func
     def show_netlist_info(self) -> None:
@@ -51,7 +52,6 @@ class GlobalRouter:
         if os.path.exists(output_file_path):
             file_mode = "w"
 
-        self.netlist.sort(key=lambda x: x.net_id)
         with open(output_file_path, file_mode, encoding="UTF-8") as output:
             for net in self.netlist:
                 output.write(f"{net.net_name} {net.net_id}\n")
@@ -71,6 +71,22 @@ class GlobalRouter:
     @util.log_func
     def rip_up_and_reroute(self):
         """rip up and reroute"""
+        overflow_nets: List[Net] = []
+        for net in self.netlist:
+            if self.is_overflow(net.path):
+                overflow_nets.append(net)
+
+        random.shuffle(overflow_nets)
+        # overflow_nets.sort(key=lambda x: x.hpwl)
+
+        with click.progressbar(overflow_nets, label="Performing Rip-up and Reroute") as nets:
+            for net in nets:
+                self.update_demand(net.path, False)  # removing the path
+                self.route_two_pin_net(net)  # rerouting the path
+                self.update_demand(net.path, True)  # replacing the path
+
+        self.update_overflow()
+        return self.overflow, self.wirelength
 
     def get_next_coordinate(
         self,
@@ -217,7 +233,7 @@ class GlobalRouter:
 
         Args:
             path (Path): path
-            increment (bool): demand is incremented
+            increment (bool): demand is incremented, else decremented
         """
         for edge_id in path.edge_id_list:
             if increment:
@@ -236,6 +252,7 @@ class GlobalRouter:
         total_wirelength = 0
         overflow = 0
         for i in range(self.number_of_edges):
+            # get wirelength from demand list
             total_wirelength += self.demand[i]
             capacity = self.vertical_capacity
             if i < self.number_of_horizontal_edges:
@@ -245,7 +262,9 @@ class GlobalRouter:
                 continue
             total_overflow += overflow
             max_overflow = max(overflow, max_overflow)
-        return (total_overflow, total_wirelength)
+        self.max_overflow = max_overflow
+        self.overflow = total_overflow
+        self.wirelength = total_wirelength
 
     @util.timeit
     @util.log_func
@@ -259,11 +278,10 @@ class GlobalRouter:
                 self.route_two_pin_net(net)
                 self.update_demand(net.path, True)
 
-        total_overflow, total_wirelength = self.update_overflow()
-        gr_logger.info(f"Total Overflow: {total_overflow}")
-        gr_logger.info(f"Total Wirelength: {total_wirelength}")
-        self.overflow = total_overflow
-        self.wirelength = total_wirelength
+        self.update_overflow()
+        gr_logger.info(f"Total Overflow: {self.overflow}")
+        gr_logger.info(f"Total Wirelength: {self.wirelength}")
+        self.netlist.sort(key=lambda x: x.net_id)
 
     def generate_congestion_output(self, output_file_name: str):
         """Generate the congestion data for the output
@@ -282,7 +300,8 @@ class GlobalRouter:
                 output.write(
                     f"{self.demand[i]/(self.horizontal_capacity if i < self.number_of_horizontal_edges else self.vertical_capacity)} "
                 )
-            gr_logger.info(f"Congestion data generated into {output_file_name}.fig")
+            gr_logger.info(
+                f"Congestion data generated into {output_file_name}.fig")
 
     @util.log_func
     def parse_input(self, input_file_path: str) -> list[Net]:

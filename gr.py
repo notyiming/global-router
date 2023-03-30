@@ -39,8 +39,8 @@ def global_route(input_file: str, output_file: str):
         global_routers.append(router_copy)
 
     best_gr_index = 0
-    best_gr_overflow = math.inf
-    best_wire_length = math.inf
+    min_overflow = math.inf
+    min_wirelength = math.inf
 
     gr_logger.info(f"Number of Global Routers in parallel: {num_threads}")
 
@@ -50,22 +50,43 @@ def global_route(input_file: str, output_file: str):
 
     for i in range(num_threads):
         router = global_routers[i]
-        if router.overflow < best_gr_overflow or (router.overflow == best_gr_overflow and router.wirelength < best_wire_length):
-            best_gr_overflow = router.overflow
-            best_wire_length = router.wirelength
+        if router.overflow < min_overflow or (router.overflow == min_overflow and router.wirelength < min_wirelength):
+            min_overflow = router.overflow
+            min_wirelength = router.wirelength
             best_gr_index = i
-    gr_logger.info("===================================")
-    gr_logger.info(f"Best Router Index: {best_gr_index}")
-    gr_logger.info(f"Best Overflow: {best_gr_overflow}")
-    gr_logger.info(f"Best Wirelength: {best_wire_length}")
-    gr_logger.info("===================================")
+    gr_logger.info(
+        "\n==============================\n"
+        "    Initial Routing Result    \n"
+        "==============================\n"
+        f"Best Router Index: {best_gr_index}\n"
+        f"Best Overflow: {min_overflow}\n"
+        f"Best Wirelength: {min_wirelength}\n"
+        "==============================\n")
 
-    if best_gr_overflow > 0:
-        global_routers[best_gr_index].rip_up_and_reroute()
+    if min_overflow > 0:
+        num_of_reroutes = 0
+        while num_of_reroutes < 10 and min_overflow > 0:
+            gr_logger.info(f"Rip-up and reroute #{num_of_reroutes + 1}:")
+            new_min_overflow, new_min_wirelength = global_routers[best_gr_index].rip_up_and_reroute()
+            if new_min_overflow < min_overflow or (new_min_overflow == min_overflow and new_min_wirelength < min_wirelength):
+                min_overflow = new_min_overflow
+                min_wirelength = new_min_wirelength
+            gr_logger.info(f"New Min Overflow: {new_min_overflow}")
+            gr_logger.info(f"New Min Wirelength: {new_min_wirelength}")
+            num_of_reroutes += 1
+
+    gr_logger.info(
+        "\n==============================\n"
+        "     Final Routing Result     \n"
+        "==============================\n"
+        f"Best Router Index: {best_gr_index}\n"
+        f"Best Overflow: {min_overflow}\n"
+        f"Best Wirelength: {min_wirelength}\n"
+        "==============================\n")
 
     global_routers[best_gr_index].dump_result(output_file)
     global_routers[best_gr_index].generate_congestion_output(output_file)
-    return (netlist_details, best_gr_overflow, best_wire_length)
+    return (netlist_details, min_overflow, min_wirelength)
 
 
 def _run_global_route(router: GlobalRouter):
