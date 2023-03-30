@@ -6,7 +6,7 @@ timeLimit=600
 root=$( pwd )
 outputDir=$root/output
 testcaseDir=$root/testcase
-verifyBin=$root/verify
+verifyBin=$root/assessment/verify
 chmod 744 $verifyBin
 
 function timeout()
