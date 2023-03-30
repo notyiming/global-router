@@ -51,6 +51,7 @@ class GlobalRouter:
         if os.path.exists(output_file_path):
             file_mode = "w"
 
+        self.netlist.sort(key=lambda x: x.net_id)
         with open(output_file_path, file_mode, encoding="UTF-8") as output:
             for net in self.netlist:
                 output.write(f"{net.net_name} {net.net_id}\n")
