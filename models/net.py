@@ -1,14 +1,14 @@
 """Net Module"""
 
 import math
-from typing import List, Tuple
+from typing import List, Tuple, NoReturn
 from models.path import Path
 
 
 class Net:
     """Net class represents a wire that connects two or more pins"""
 
-    def __init__(self, net_id, net_name, num_of_pins, net_pins_coordinates):
+    def __init__(self, net_id, net_name, num_of_pins, net_pins_coordinates) -> None:
         self.net_id: int = net_id
         self.net_name: str = net_name
         self.num_of_pins: int = num_of_pins
