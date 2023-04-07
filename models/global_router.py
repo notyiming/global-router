@@ -85,7 +85,7 @@ class GlobalRouter:
                 self.route_two_pin_net(net)  # rerouting the path
                 self.update_demand(net.path, True)  # replacing the path
 
-        self.update_overflow()
+        self.update_overflow_wirelength()
         return self.overflow, self.wirelength
 
     def get_next_coordinate(
@@ -171,9 +171,9 @@ class GlobalRouter:
             float: cost of the edge
         """
         capacity = self.horizontal_capacity if edge_id < self.number_of_horizontal_edges else self.vertical_capacity
-        if self.demand[edge_id] < capacity:
-            return 1.0 + (self.demand[edge_id] + 1) / capacity
-        return 1e4
+        if self.demand[edge_id] >= capacity: # if the edge is overflown
+            return 1e4
+        return 1.0 + (self.demand[edge_id] + 1) / capacity
 
     def route_two_pin_net(self, net: Net):
         """Route a two-pin net (BFS)
@@ -191,15 +191,15 @@ class GlobalRouter:
         heapq.heapify(priority_queue)
         heapq.heappush(priority_queue, node)
 
-        node_used = [False] * self.number_of_nodes
+        node_used = set()
         best_path = None
 
         while priority_queue:
             current_node: Node = heapq.heappop(priority_queue)
 
-            if node_used[current_node.node_id]:
+            if current_node.node_id in node_used:
                 continue
-            node_used[current_node.node_id] = True
+            node_used.add(current_node.node_id)
 
             if current_node.coordinates == end_pin:
                 best_path = current_node
@@ -236,12 +236,12 @@ class GlobalRouter:
             increment (bool): demand is incremented, else decremented
         """
         for edge_id in path.edge_id_list:
-            if increment:
+            if increment: # place wire
                 self.demand[edge_id] += 1
-            else:
+            else: # remove wire
                 self.demand[edge_id] -= 1
 
-    def update_overflow(self) -> Tuple[int, int]:
+    def update_overflow_wirelength(self) -> Tuple[int, int]:
         """Update overflow info for the layout
 
         Returns:
@@ -278,7 +278,7 @@ class GlobalRouter:
                 self.route_two_pin_net(net)
                 self.update_demand(net.path, True)
 
-        self.update_overflow()
+        self.update_overflow_wirelength()
         gr_logger.info(f"Total Overflow: {self.overflow}")
         gr_logger.info(f"Total Wirelength: {self.wirelength}")
         self.netlist.sort(key=lambda x: x.net_id)
