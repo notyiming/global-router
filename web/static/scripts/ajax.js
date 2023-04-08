@@ -1,5 +1,5 @@
-var netlist_count = 0;
-var result_list = [];
+var result_cache_list = [];
+var netlist_count = $('#netlist-tabs li').length;
 
 $(document).ready(function () {
 
@@ -18,6 +18,7 @@ $(document).ready(function () {
             async: true,
             success: function (result) {
                 ready_job_state(curr_count);
+                result_cache_list.push({ netlist_name, result });
             }
         })
         e.preventDefault();
@@ -55,7 +56,7 @@ $(document).ready(function () {
             contentType: false,
             success: function (result) {
                 ready_job_state(curr_count);
-                result_list.push({ sample_netlist_file, result });
+                result_cache_list.push({ sample_netlist_file, result });
             }
         })
         e.preventDefault();
@@ -91,12 +92,12 @@ function update_view(netlist_name, result, id) {
 }
 
 function view_visual(id) {
-    netlist = result_list[id - 1]
+    netlist = result_cache_list[id]
     netlist_name = netlist.sample_netlist_file;
     netlist_data = netlist.result;
-    $("#netlist-" + id).find("td button").attr("disabled", "disabled").text("Opened");
-    add_tab(netlist_data["fig_html"], id);
-    update_view(netlist_name, netlist_data, id);
+    $("#netlist-" + netlist_count).find("td button").attr("disabled", "disabled").text("Opened");
+    add_tab(netlist_data["fig_html"], netlist_count);
+    update_view(netlist_name, netlist_data, netlist_count);
 }
 
 function update_job_monitor(netlist_name, netlist_count) {
@@ -105,7 +106,7 @@ function update_job_monitor(netlist_name, netlist_count) {
     var newRow = '<tr id=' + newRowId + '><th scope="row">' + netlist_count + '</th>'
     newRow += ('<td>' + netlist_name + '</td>');
     newRow += ('<td class="routing-status">' + 'Routing' + '</td>');
-    newRow += ('<td><button class="btn btn-primary" onclick="view_visual(' + netlist_count + ')" disabled>View</button></td>');
+    newRow += ('<td><button class="btn btn-primary" onclick="view_visual(' + result_cache_list.length + ')" disabled>View</button></td>');
     jobMonitor.append(newRow);
 }
 

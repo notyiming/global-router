@@ -59,7 +59,8 @@
               <option value="4">IBM03</option>
               <option value="5">IBM04</option>
             </select>
-            <button type="button" id="sample-netlist" class="input-group-text btn btn-primary mb-3" disabled>Submit Netlist</button>
+            <button type="button" id="sample-netlist" class="input-group-text btn btn-primary mb-3" disabled>Submit
+              Netlist</button>
           </div>
         </div>
       </div>
@@ -79,6 +80,16 @@
               </tr>
             </thead>
             <tbody>
+              {% for output in outputs %}
+              <tr>
+                <th scope="row">{{loop.index}}</th>
+                <td>{{output.name}}</td>
+                <td style="color: green;">Ready</td>
+                <td>
+                  <button class="btn btn-primary" onclick="view_visual(' + {{loop.index }}+ ')" disabled>Opened</button>
+                </td>
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
         </div>
@@ -90,6 +101,41 @@
         <div class="card-header">
           <h3 class="text-muted me-auto">Congestion Visualization</h3>
         </div>
+        {% if outputs %}
+        <div class="card-body" id="output-view">
+          <ul class="nav nav-pills mb-3" id="netlist-tabs" role="tablist">
+            {% for output in outputs %}
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tab-{{loop.index}}-tab" data-bs-toggle="pill" data-bs-target="#tab-{{loop.index}}" type="button"
+                role="tab" aria-controls="tab-{{loop.index}}" aria-selected="false">Plot-{{loop.index}}</button>
+            </li>
+            {% endfor %}
+          </ul>
+          <div class="tab-content" id="netlist-tabs-content">
+            {% for output in outputs %}
+            <div class="tab-pane fade" id="tab-{{loop.index}}" role="tabpanel" aria-labelledby="tab-{{loop.index}}-tab">
+              <div class="row">
+                <div id="plot-view" class="col-xl-8">{{output.fig_html|safe}}</div>
+                <div class="col-xl-4" id="netlist-output-details">
+                  <span>
+                    <h5>Netlist Details</h5>
+                    <ul id="netlist-details-list">
+                      <li id="netlist-name-{{loop.index}}">Name: {{output.name}}</li>
+                      <li id="grid-size-{{loop.index}}">Grid: {{output.netlist_details.grid_hor}} x {{output.netlist_details.grid_ver}}</li>
+                      <li id="horcap-{{loop.index}}">Horizontal Capacity: {{output.netlist_details.hor_cap}}</li>
+                      <li id="vercap-{{loop.index}}">Vertical Capacity: {{output.netlist_details.ver_cap}}</li>
+                      <li id="netlist-size-{{loop.index}}">Netlist Size: {{output.netlist_size}}</li>
+                      <li id="overflow-{{loop.index}}">Overflow: {{output.overflow}}</li>
+                      <li id="wirelength-{{loop.index}}">Wirelength: {{output.wirelength}}</li>
+                    </ul>
+                  </span>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% else %}
         <div class="card-body row" id="output-view">
           <div id="plot-view" class="col-xl-8 diagonal-text">
             <h4>Congestion Plot</h4>
@@ -100,6 +146,7 @@
               <span id="no-netlist-provided-span">No netlist provided</span>
             </span>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>

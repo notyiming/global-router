@@ -1,5 +1,6 @@
 """Flask App"""
 
+import base64
 from pathlib import Path
 import os
 from flask import Flask, flash, jsonify, session, render_template, request, redirect
@@ -14,7 +15,6 @@ UPLOAD_FOLDER = 'uploaded_netlists'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
 
 config = dotenv_values()
 
@@ -35,6 +35,7 @@ if len(config) == 0:
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 storage = firebase.storage()
+db = firebase.database()
 app.secret_key = config["secretKey"]
 
 
@@ -88,9 +89,13 @@ def register():
     if request.method == "POST":
         email = request.form.get("email")
         password = request.form.get("password")
+        fname = request.form.get("fname")
+        lname = request.form.get("lname")
         try:
             user = auth.create_user_with_email_and_password(email, password)
             auth.send_email_verification(user["idToken"])
+            encoded_email = base64.urlsafe_b64encode(email.encode()).decode().rstrip("=")
+            db.child("users").child(encoded_email).set({"fname": fname, "lname": lname, "email": email})
             flash("Account created, please verify email", "info")
             return redirect("/login")
         except HTTPError as error:
@@ -100,7 +105,7 @@ def register():
             elif "WEAK_PASSWORD" in error:
                 flash("Password should be at least 6 characters", "error")
             else:
-                flash("Other HTTP error occured", "error")
+                flash(error, "error")
             return redirect("/register")
 
     elif request.method == "GET":
@@ -134,14 +139,19 @@ def dashboard():
         file_basename = Path(netlist_file).stem
         netlist_details, overflow, wirelength = gr.global_route.callback(netlist_file, f"output/{file_basename}.out")
         result["netlist_details"] = netlist_details
+        result["name"] = file_basename + ".txt"
         result["overflow"] = overflow
         result["wirelength"] = wirelength
         result["fig_html"] = gr.plot_congestion.callback(f"output/{file_basename}.out.fig")
+        encoded_email = base64.urlsafe_b64encode(session["user"].encode()).decode().rstrip("=")
+        db.child("users").child(encoded_email).child("outputs").push(result)
+        storage.child(f"{session['user']}/{file_basename}.out").put(f"output/{file_basename}.out")
 
         return jsonify(result)
 
-
-    return render_template("dashboard.html", user=session["user"])
+    user = db.child("users").child(base64.urlsafe_b64encode(session["user"].encode()).decode().rstrip("="))
+    outputs = user.child("outputs").get().val()
+    return render_template("dashboard.html", user=session["user"], outputs=outputs.values() if outputs else [])
 
 def _allowed_file(filename: str) -> bool:
     return '.' in filename and \
