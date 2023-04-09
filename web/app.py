@@ -1,6 +1,8 @@
 """Flask App"""
 
 import base64
+from datetime import datetime
+import glob
 from pathlib import Path
 import os
 from flask import Flask, flash, jsonify, session, render_template, request, redirect
@@ -115,6 +117,7 @@ def register():
 @app.route("/dashboard", methods=["POST", "GET"])
 def dashboard():
     """Lauch User Dashboard"""
+    encoded_email = base64.urlsafe_b64encode(session["user"].encode()).decode().rstrip("=")
     if "user" not in session:
         return redirect("/login")
 
@@ -135,23 +138,33 @@ def dashboard():
                 netlist_file = os.path.join(app.config["UPLOAD_FOLDER"], filename)
                 file.save(netlist_file)
 
-        result = {}
-        file_basename = Path(netlist_file).stem
+        file_basename = Path(netlist_file).stem 
         netlist_details, overflow, wirelength = gr.global_route.callback(netlist_file, f"output/{file_basename}.out")
+
+        timenow = datetime.now()
+        formatted_timenow = timenow.strftime('%Y-%m-%d %H:%M:%S')
+        unix_timenow = int(timenow.timestamp())
+
+        result = {}
         result["netlist_details"] = netlist_details
-        result["name"] = file_basename + ".txt"
+        result["name"] = file_basename
         result["overflow"] = overflow
         result["wirelength"] = wirelength
+        result["timestamp"] = formatted_timenow
         result["fig_html"] = gr.plot_congestion.callback(f"output/{file_basename}.out.fig")
-        encoded_email = base64.urlsafe_b64encode(session["user"].encode()).decode().rstrip("=")
+
         db.child("users").child(encoded_email).child("outputs").push(result)
         storage.child(f"{session['user']}/{file_basename}.out").put(f"output/{file_basename}.out")
 
+        # remove output file after saving to firebase
+        for output_file in glob.glob(f"output/{file_basename}*"):
+            os.remove(output_file)
+
         return jsonify(result)
 
-    user = db.child("users").child(base64.urlsafe_b64encode(session["user"].encode()).decode().rstrip("="))
-    outputs = user.child("outputs").get().val()
-    return render_template("dashboard.html", user=session["user"], outputs=outputs.values() if outputs else [])
+    user = db.child("users").child(encoded_email).child("fname").get().val()
+    outputs = db.child("users").child(encoded_email).child("outputs").get().val()
+    return render_template("dashboard.html", user=user, outputs=outputs.values() if outputs else [])
 
 def _allowed_file(filename: str) -> bool:
     return '.' in filename and \

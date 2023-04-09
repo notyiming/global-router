@@ -23,7 +23,7 @@
           User
           {% endif %}
         </a>
-        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
           <li><a class="dropdown-item" href="/logout">Logout</a></li>
         </ul>
       </span>
@@ -76,6 +76,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Status</th>
+                <th scope="col">Timestamp</th>
                 <th scope="col">Action</th>
               </tr>
             </thead>
@@ -85,6 +86,7 @@
                 <th scope="row">{{loop.index}}</th>
                 <td>{{output.name}}</td>
                 <td style="color: green;">Ready</td>
+                <td>{{output.timestamp}}</td>
                 <td>
                   <button class="btn btn-primary" onclick="view_visual(' + {{loop.index }}+ ')" disabled>Opened</button>
                 </td>
@@ -127,6 +129,7 @@
                       <li id="netlist-size-{{loop.index}}">Netlist Size: {{output.netlist_size}}</li>
                       <li id="overflow-{{loop.index}}">Overflow: {{output.overflow}}</li>
                       <li id="wirelength-{{loop.index}}">Wirelength: {{output.wirelength}}</li>
+                      <li id="timestamp-{{loop.index}}">Timestamp: {{output.timestamp}}</li>
                     </ul>
                   </span>
                 </div>
