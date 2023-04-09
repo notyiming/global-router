@@ -96,8 +96,10 @@ def register():
         try:
             user = auth.create_user_with_email_and_password(email, password)
             auth.send_email_verification(user["idToken"])
-            encoded_email = base64.urlsafe_b64encode(email.encode()).decode().rstrip("=")
-            db.child("users").child(encoded_email).set({"fname": fname, "lname": lname, "email": email})
+            encoded_email = base64.urlsafe_b64encode(
+                email.encode()).decode().rstrip("=")
+            db.child("users").child(encoded_email).set(
+                {"fname": fname, "lname": lname, "email": email})
             flash("Account created, please verify email", "info")
             return redirect("/login")
         except HTTPError as error:
@@ -114,10 +116,22 @@ def register():
         return render_template("register.html")
 
 
+@app.route("/download/<path:filename>")
+def download(filename):
+    """Download Output File"""
+    if "user" not in session:
+        return redirect("/login")
+    encoded_email = base64.urlsafe_b64encode(
+        session["user"].encode()).decode().rstrip("=")
+    user = db.child("users").child(encoded_email).get().val()
+    return redirect(storage.child(f"{user['email']}/{filename}").get_url(None))
+
+
 @app.route("/dashboard", methods=["POST", "GET"])
 def dashboard():
     """Lauch User Dashboard"""
-    encoded_email = base64.urlsafe_b64encode(session["user"].encode()).decode().rstrip("=")
+    encoded_email = base64.urlsafe_b64encode(
+        session["user"].encode()).decode().rstrip("=")
     if "user" not in session:
         return redirect("/login")
 
@@ -135,11 +149,13 @@ def dashboard():
             if file and _allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-                netlist_file = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+                netlist_file = os.path.join(
+                    app.config["UPLOAD_FOLDER"], filename)
                 file.save(netlist_file)
 
-        file_basename = Path(netlist_file).stem 
-        netlist_details, overflow, wirelength = gr.global_route.callback(netlist_file, f"output/{file_basename}.out")
+        file_basename = Path(netlist_file).stem
+        netlist_details, overflow, wirelength = gr.global_route.callback(
+            netlist_file, f"output/{file_basename}.out")
 
         timenow = datetime.now()
         formatted_timenow = timenow.strftime('%Y-%m-%d %H:%M:%S')
@@ -151,10 +167,13 @@ def dashboard():
         result["overflow"] = overflow
         result["wirelength"] = wirelength
         result["timestamp"] = formatted_timenow
-        result["fig_html"] = gr.plot_congestion.callback(f"output/{file_basename}.out.fig")
+        result["unique_name"] = f"{file_basename}_{unix_timenow}"
+        result["fig_html"] = gr.plot_congestion.callback(
+            f"output/{file_basename}.out.fig")
 
         db.child("users").child(encoded_email).child("outputs").push(result)
-        storage.child(f"{session['user']}/{file_basename}.out").put(f"output/{file_basename}.out")
+        storage.child(
+            f"{session['user']}/{result['unique_name']}").put(f"output/{file_basename}.out")
 
         # remove output file after saving to firebase
         for output_file in glob.glob(f"output/{file_basename}*"):
@@ -163,8 +182,10 @@ def dashboard():
         return jsonify(result)
 
     user = db.child("users").child(encoded_email).child("fname").get().val()
-    outputs = db.child("users").child(encoded_email).child("outputs").get().val()
+    outputs = db.child("users").child(
+        encoded_email).child("outputs").get().val()
     return render_template("dashboard.html", user=user, outputs=outputs.values() if outputs else [])
+
 
 def _allowed_file(filename: str) -> bool:
     return '.' in filename and \

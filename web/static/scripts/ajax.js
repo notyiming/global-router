@@ -83,6 +83,7 @@ function update_view(netlist_name, result, id) {
     var overflow = result["overflow"];
     var wirelength = result["wirelength"];
     var timestamp = result["timestamp"];
+    var unique_name = result["unique_name"];
     $('#no-netlist-provided-span').attr("hidden", "true");
     $('#netlist-name-' + id).html("Name: " + netlist_name);
     $('#grid-size-' + id).html("Grid: " + gridhor + " x " + gridver);
@@ -92,6 +93,7 @@ function update_view(netlist_name, result, id) {
     $('#overflow-' + id).html("Overflow: " + overflow);
     $('#wirelength-' + id).html("Wirelength: " + wirelength);
     $('#timestamp-' + id).html("Timestamp: " + timestamp);
+    $('#download-output-' + id).attr("href", "download/" + unique_name);
 }
 
 function view_visual(id) {
@@ -133,6 +135,7 @@ function add_tab(figHtml, id) {
               <li id="overflow-${numTabs}"></li>
               <li id="wirelength-${numTabs}"></li>
             </ul>
+            <a href="#" id="download-output-${numTabs}" class="btn btn-primary">Download Output</a>
           </span>
         </div>
       </div>
