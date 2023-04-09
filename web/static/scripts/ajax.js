@@ -19,6 +19,7 @@ $(document).ready(function () {
             success: function (result) {
                 ready_job_state(curr_count, result["timestamp"]);
                 result_cache_list.push({ netlist_name, result });
+                console.log(result_cache_list);
             }
         })
         e.preventDefault();
@@ -26,37 +27,38 @@ $(document).ready(function () {
 
     $('#sample-netlist').on('click', function (e) {
         var selected_netlist = parseInt($('#sample-netlist-select').val());
-        let sample_netlist_file;
+        let netlist_name;
         switch (selected_netlist) {
             case 1:
-                sample_netlist_file = "example";
+                netlist_name = "example";
                 break;
             case 2:
-                sample_netlist_file = "ibm01.modified";
+                netlist_name = "ibm01.modified";
                 break;
             case 3:
-                sample_netlist_file = "ibm02.modified";
+                netlist_name = "ibm02.modified";
                 break;
             case 4:
-                sample_netlist_file = "ibm03.modified";
+                netlist_name = "ibm03.modified";
                 break;
             case 5:
-                sample_netlist_file = "ibm04.modified";
+                netlist_name = "ibm04.modified";
                 break;
             default:
-                sample_netlist_file = "example";
+                netlist_name = "example";
                 break;
         }
         var curr_count = ++netlist_count;
-        update_job_monitor(sample_netlist_file, curr_count);
+        update_job_monitor(netlist_name, curr_count);
         $.ajax({
-            data: 'testcase/' + sample_netlist_file + ".txt",
+            data: 'testcase/' + netlist_name + ".txt",
             type: 'POST',
             url: '/dashboard',
             contentType: false,
             success: function (result) {
                 ready_job_state(curr_count, result["timestamp"]);
-                result_cache_list.push({ sample_netlist_file, result });
+                result_cache_list.push({ netlist_name, result });
+                console.log(result_cache_list);
             }
         })
         e.preventDefault();
@@ -98,7 +100,7 @@ function update_view(netlist_name, result, id) {
 
 function view_visual(id) {
     netlist = result_cache_list[id]
-    netlist_name = netlist.sample_netlist_file;
+    netlist_name = netlist.netlist_name;
     netlist_data = netlist.result;
     $("#netlist-" + netlist_count).find("td button").attr("disabled", "disabled").text("Opened");
     add_tab(netlist_data["fig_html"], netlist_count);
@@ -134,6 +136,7 @@ function add_tab(figHtml, id) {
               <li id="netlist-size-${numTabs}"></li>
               <li id="overflow-${numTabs}"></li>
               <li id="wirelength-${numTabs}"></li>
+              <li id="timestamp-${numTabs}"></li>
             </ul>
             <a href="#" id="download-output-${numTabs}" class="btn btn-primary">Download Output</a>
           </span>
