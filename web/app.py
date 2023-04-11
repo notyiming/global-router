@@ -154,6 +154,10 @@ def dashboard():
                 file.save(netlist_file)
 
         file_basename = Path(netlist_file).stem
+
+        # if output directory does not exist, create it
+        os.makedirs("output", exist_ok=True)
+
         netlist_details, overflow, wirelength = gr.global_route.callback(
             netlist_file, f"output/{file_basename}.out")
 
