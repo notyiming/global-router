@@ -164,8 +164,8 @@ def plot_congestion(congestion_data_file_path: str, display_plot_from_cli=False)
         ])
 
         # Plot the rectangles
-        with click.progressbar(range(len(congestion_data)), label="Generating Congestion Plot") as bar:
-            for i in bar:
+        with click.progressbar(range(len(congestion_data)), label="Generating Congestion Plot") as data:
+            for i in data:
                 ax.add_patch(patches.Rectangle(
                     (x[i], y[i]),
                     0.4 if i < num_hor else 0.1,
