@@ -194,15 +194,15 @@ class GlobalRouter:
         heapq.heapify(priority_queue)
         heapq.heappush(priority_queue, node)
 
-        node_used = set()
+        visited_nodes = set()
         best_path = None
 
         while priority_queue:
             current_node: Node = heapq.heappop(priority_queue)
 
-            if current_node.node_id in node_used:
+            if current_node.node_id in visited_nodes:
                 continue
-            node_used.add(current_node.node_id)
+            visited_nodes.add(current_node.node_id)
 
             if current_node.coordinates == end_pin:
                 best_path = current_node
@@ -215,13 +215,17 @@ class GlobalRouter:
                     continue
                 next_node = Node(current_node, next_coordinate)
 
-                # set edge ID
-                next_node.edge_id = self.get_edge_id(
-                    current_node.coordinates, i)
-
                 # set node ID
                 next_node.node_id = self.get_node_id(
                     next_coordinate) 
+
+                # check if neighbor node is already used
+                if next_node.node_id in visited_nodes:
+                    continue
+
+                # set edge ID
+                next_node.edge_id = self.get_edge_id(
+                    current_node.coordinates, i)
 
                 # set cost
                 next_node.cost = current_node.cost + self.get_edge_cost(next_node.edge_id)
@@ -245,15 +249,15 @@ class GlobalRouter:
         heap = fibheap.makefheap()
         fibheap.fheappush(heap, node)
 
-        node_used = set()
+        visited_nodes = set()
         best_path = None
 
         while heap:
             current_node = fibheap.fheappop(heap)
 
-            if current_node.node_id in node_used:
+            if current_node.node_id in visited_nodes:
                 continue
-            node_used.add(current_node.node_id)
+            visited_nodes.add(current_node.node_id)
 
             if current_node.coordinates == end_pin:
                 best_path = current_node
