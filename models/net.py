@@ -14,9 +14,9 @@ class Net:
         self.num_of_pins: int = num_of_pins
         self.net_pins_coordinates: List[Tuple[int, int]] = net_pins_coordinates
         self.path: Path = None
-        self.hpwl: int = self.update_hpwl()
+        self.hpwl: int = self.set_hpwl()
 
-    def update_hpwl(self) -> int:
+    def set_hpwl(self) -> int:
         """Set the value of HPWL (Half-Perimeter Wirelength)
 
         Returns:
