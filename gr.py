@@ -6,6 +6,7 @@ import math
 import click
 import multiprocessing
 from matplotlib import patches, pyplot as plt
+import numpy as np
 import mpld3
 from models.global_router import GlobalRouter
 from logs.gr_logger import gr_logger
@@ -67,7 +68,8 @@ def global_route(input_file: str, output_file: str):
         num_of_reroutes = 0
         while num_of_reroutes < 10 and min_overflow > 0:
             gr_logger.info(f"Rip-up and reroute #{num_of_reroutes + 1}:")
-            new_min_overflow, new_min_wirelength = global_routers[best_gr_index].rip_up_and_reroute()
+            new_min_overflow, new_min_wirelength = global_routers[best_gr_index].rip_up_and_reroute(
+            )
             if new_min_overflow < min_overflow or (new_min_overflow == min_overflow and new_min_wirelength < min_wirelength):
                 min_overflow = new_min_overflow
                 min_wirelength = new_min_wirelength
@@ -132,45 +134,39 @@ def plot_congestion(congestion_data_file_path: str, display_plot_from_cli=False)
         grid_hor = int(grid_data[0])
         grid_ver = int(grid_data[1])
         num_hor = (grid_hor - 1)*grid_ver
-        congestion_data = [float(n) for n in data.readline().split()]
+        congestion_data = np.array([float(n) for n in data.readline().split()])
 
-        with click.progressbar(congestion_data, label="Generating Congestion Plot") as congestion_data:
-            for i, congestion_level in enumerate(congestion_data):
-                if congestion_level == 0:
-                    edge_color = "white"
-                elif congestion_level <= 0.25:
-                    edge_color = "blue"
-                elif congestion_level <= 0.5:
-                    edge_color = "cyan"
-                elif congestion_level <= 0.75:
-                    edge_color = "green"
-                elif congestion_level <= 1.0:
-                    edge_color = "yellow"
-                else:
-                    edge_color = "red"
+        # Get the corresponding colors for each congestion level
+        colors = np.select(
+            [congestion_data == 0, congestion_data <= 0.25, congestion_data <= 0.5,
+             congestion_data <= 0.75, congestion_data <= 1.0, congestion_data > 1.0],
+            ["white", "blue", "cyan", "green", "yellow", "red"]
+        )
 
-                if i < num_hor:
-                    x = 0.15 + int(i % (grid_hor-1))*0.6
-                    y = int(i/(grid_hor-1))*0.6
-                    ax.add_patch(patches.Rectangle(
-                        (x, y),
-                        0.4,
-                        0.1,
-                        edgecolor=edge_color,
-                        facecolor=edge_color,
-                        linestyle='-',
-                    ))
-                else:
-                    x = int((i-num_hor) % (grid_hor))*0.6
-                    y = 0.15 + int((i-num_hor)/(grid_hor))*0.6
-                    ax.add_patch(patches.Rectangle(
-                        (x, y),
-                        0.1,
-                        0.4,
-                        edgecolor=edge_color,
-                        facecolor=edge_color,
-                        linestyle='-',
-                    ))
+        # Calculate the x and y coordinates for each rectangle
+        x = np.concatenate([
+            np.array([0.15 + int(i % (grid_hor-1))
+                     * 0.6 for i in range(num_hor)]),
+            np.array([int((i-num_hor) % (grid_hor)) *
+                     0.6 for i in range(num_hor, len(congestion_data))])
+        ])
+        y = np.concatenate([
+            np.array([int(i/(grid_hor-1))*0.6 for i in range(num_hor)]),
+            np.array([0.15 + int((i-num_hor)/(grid_hor)) *
+                     0.6 for i in range(num_hor, len(congestion_data))])
+        ])
+
+        # Plot the rectangles
+        with click.progressbar(range(len(congestion_data)), label="Generating Congestion Plot") as bar:
+            for i in bar:
+                ax.add_patch(patches.Rectangle(
+                    (x[i], y[i]),
+                    0.4 if i < num_hor else 0.1,
+                    0.1 if i < num_hor else 0.4,
+                    edgecolor=colors[i],
+                    facecolor=colors[i],
+                    linestyle='-',
+                ))
     ax.set_aspect('equal', adjustable='box')
     ax.autoscale_view()
 
