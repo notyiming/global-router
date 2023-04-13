@@ -3,8 +3,8 @@
 
 import copy
 import math
-import click
 import multiprocessing
+import click
 from matplotlib import patches, pyplot as plt
 import numpy as np
 import mpld3
@@ -31,7 +31,14 @@ def global_route(input_file: str, output_file: str):
     """
     global_router = GlobalRouter()
     netlist_details = global_router.parse_input(input_file)
-    global_router.show_netlist_info()
+    gr_logger.info(
+        "\nLayout and Netlist Details\n"
+        "==========================\n"
+        f"Grid: {netlist_details['grid_hor']} x {netlist_details['grid_ver']}\n"
+        f"Vertical Capacity: {netlist_details['ver_cap']}\n"
+        f"Horizontal Capacity: {netlist_details['hor_cap']}\n"
+        f"Number of nets: {netlist_details['netlist_size']}\n"
+    )
 
     num_threads = 5
     global_routers: list[GlobalRouter] = []
