@@ -37,8 +37,7 @@ class GlobalRouter:
         with open(output_file_path, file_mode, encoding="UTF-8") as output:
             for net in self.netlist:
                 output.write(f"{net.net_name} {net.net_id}\n")
-                path = net.path
-                coordinates = path.coordinates_list
+                coordinates = net.path.coordinates_list
                 for i in range(len(coordinates) - 1):
                     output.write(
                         f"({coordinates[i][0]}, {coordinates[i][1]}, 1)")
@@ -207,11 +206,7 @@ class GlobalRouter:
         net.path = Path(best_path)
 
     def update_overflow_wirelength(self) -> Tuple[int, int]:
-        """Update overflow info for the layout
-
-        Returns:
-            Tuple[int, int]: (total_overflow, wirelength)
-        """
+        """Update overflow and wirelength for the layout"""
         total_overflow = 0
         total_wirelength = 0
         overflow = 0
