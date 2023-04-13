@@ -19,6 +19,12 @@ Path
     :members:
     :member-order: bysource
 
+Grid
+----
+.. automodule:: models.grid
+    :members:
+    :member-order: bysource
+
 Global Router
 -------------
 .. automodule:: models.global_router
