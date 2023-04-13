@@ -4,6 +4,7 @@ import heapq
 import os
 import random
 from typing import List, Tuple
+import fibheap
 import click
 from models.net import Net
 from models.node import Node
@@ -162,7 +163,10 @@ class GlobalRouter:
                 return (self.grid_horizontal_size - 1) * coordinate[1] + (coordinate[0] - 1)
 
     def get_edge_cost(self, edge_id: int) -> float:
-        """Get the cost of the edge
+        """Get the cost of the edge. This cost function ensures that edges with high demand
+        have higher costs, which guides the search algorithm towards less congested paths
+        and helps find a solution more quickly.
+
 
         Args:
             edge_id (int): Edge ID
@@ -172,8 +176,8 @@ class GlobalRouter:
         """
         capacity = self.horizontal_capacity if edge_id < self.number_of_horizontal_edges else self.vertical_capacity
         if self.demand[edge_id] >= capacity: # if the edge is overflown
-            return 1e4
-        return 1.0 + (self.demand[edge_id] + 1) / capacity
+            return 10000
+        return  1 + (self.demand[edge_id] + 1) / capacity
 
     def route_two_pin_net(self, net: Net):
         """Route a two-pin net (BFS)
@@ -218,13 +222,64 @@ class GlobalRouter:
 
                 # set node ID
                 next_node.node_id = self.get_node_id(
+                    next_coordinate) 
+
+                # set cost
+                next_node.cost = current_node.cost + self.get_edge_cost(next_node.edge_id)
+
+                heapq.heappush(priority_queue, next_node)
+
+        net.path = Path(best_path)
+
+    def route_two_pin_net_fheap(self, net: Net):
+        """Route a two-pin net (Fibonacci Heap)
+
+        Args:
+            net (Net): two-pin net
+        """
+        start_pin = net.net_pins_coordinates[0]
+        end_pin = net.net_pins_coordinates[1]
+
+        node = Node(None, start_pin)
+        node.node_id = self.get_node_id(node.coordinates)
+        
+        heap = fibheap.makefheap()
+        fibheap.fheappush(heap, node)
+
+        node_used = set()
+        best_path = None
+
+        while heap:
+            current_node = fibheap.fheappop(heap)
+
+            if current_node.node_id in node_used:
+                continue
+            node_used.add(current_node.node_id)
+
+            if current_node.coordinates == end_pin:
+                best_path = current_node
+                break
+
+            for i in range(4):  # bfs (all direction)
+                next_coordinate = self.get_next_coordinate(
+                    current_node.coordinates, i)
+                if not self.coordinate_is_legal(next_coordinate):
+                    continue
+                next_node = Node(current_node, next_coordinate)
+
+                # set edge ID
+                next_node.edge_id = self.get_edge_id(
+                    current_node.coordinates, i)
+
+                # set node ID
+                next_node.node_id = self.get_node_id(
                     next_node.coordinates)  # or next_coordinates?
 
                 # set cost
                 next_node.cost = current_node.cost + \
                     self.get_edge_cost(next_node.edge_id)
 
-                heapq.heappush(priority_queue, next_node)
+                fibheap.fheappush(heap, next_node)
 
         net.path = Path(best_path)
 
