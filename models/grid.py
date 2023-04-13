@@ -3,7 +3,6 @@
 from typing import List, Tuple
 
 from models.path import Path
-from logs.gr_logger import gr_logger
 
 
 class Grid:
@@ -18,8 +17,8 @@ class Grid:
             self.grid_vertical_size  # total number of cells in the grid
         self.number_of_horizontal_edges: int = (
             self.grid_horizontal_size - 1) * self.grid_vertical_size
-        self.number_of_edges: int = (
-            self.number_of_horizontal_edges + (self.grid_vertical_size - 1) * self.grid_horizontal_size)
+        self.number_of_edges: int = self.number_of_horizontal_edges + \
+            (self.grid_vertical_size - 1) * self.grid_horizontal_size
         # the demand of each edge (ver and hor)
         self.demand: List[float] = [0] * self.number_of_edges
 
