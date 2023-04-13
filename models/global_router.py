@@ -177,7 +177,7 @@ class GlobalRouter:
         capacity = self.horizontal_capacity if edge_id < self.number_of_horizontal_edges else self.vertical_capacity
         if self.demand[edge_id] >= capacity: # if the edge is overflown
             return 10000
-        return  1 + (self.demand[edge_id] + 1) / capacity
+        return 1 + (self.demand[edge_id] + 1) / capacity
 
     def route_two_pin_net(self, net: Net):
         """Route a two-pin net (BFS)
@@ -231,7 +231,7 @@ class GlobalRouter:
 
         net.path = Path(best_path)
 
-    def route_two_pin_net_fheap(self, net: Net):
+    def route_two_pin_net_fibheap(self, net: Net):
         """Route a two-pin net (Fibonacci Heap)
 
         Args:
@@ -290,7 +290,7 @@ class GlobalRouter:
             path (Path): path
             increment (bool): demand is incremented, else decremented
         """
-        for edge_id in path.edge_id_list:
+        for edge_id in path.edge_id_set:
             if increment: # place wire
                 self.demand[edge_id] += 1
             else: # remove wire
@@ -419,7 +419,7 @@ class GlobalRouter:
         Returns:
             bool: layout has overflow
         """
-        for edge_id in path.edge_id_list:
+        for edge_id in path.edge_id_set:
             if self.demand[edge_id] > self.horizontal_capacity \
                     if edge_id < self.number_of_horizontal_edges else self.vertical_capacity:
                 return True
