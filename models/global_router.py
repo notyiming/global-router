@@ -25,7 +25,6 @@ class GlobalRouter:
         self.number_of_nodes: int = 0  # total number of cells in the grid
         self.number_of_edges: int = 0
         self.overflow: int = 0  # total number of overflow in the layout
-        self.max_overflow: int = 0  # max total number of overflow in any edge
         self.wirelength: int = 0  # total wirelength in the layout
         self.number_of_horizontal_edges: int = 0
         self.demand: List[float] = []  # the demand of each edge (ver and hor)
@@ -317,7 +316,6 @@ class GlobalRouter:
                 continue
             total_overflow += overflow
             max_overflow = max(overflow, max_overflow)
-        self.max_overflow = max_overflow
         self.overflow = total_overflow
         self.wirelength = total_wirelength
 
