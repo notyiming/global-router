@@ -5,3 +5,4 @@ Pyrebase4
 python-dotenv
 requests
 mpld3
+fibheap
