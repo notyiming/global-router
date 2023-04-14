@@ -100,16 +100,20 @@
 
     <div class="col-xl-8 p-4">
       <div class="card mb-3">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
           <h3 class="text-muted me-auto">Congestion Visualization</h3>
+          <button type="button" class="btn btn-secondary float-end" data-bs-toggle="modal" data-bs-target="#plModal">
+            Legend
+          </button>
         </div>
         {% if outputs %}
         <div class="card-body" id="output-view">
           <ul class="nav nav-pills mb-3" id="netlist-tabs" role="tablist">
             {% for output in outputs %}
             <li class="nav-item" role="presentation">
-              <button class="nav-link" id="tab-{{loop.index}}-tab" data-bs-toggle="pill" data-bs-target="#tab-{{loop.index}}" type="button"
-                role="tab" aria-controls="tab-{{loop.index}}" aria-selected="false">Plot-{{loop.index}}</button>
+              <button class="nav-link" id="tab-{{loop.index}}-tab" data-bs-toggle="pill"
+                data-bs-target="#tab-{{loop.index}}" type="button" role="tab" aria-controls="tab-{{loop.index}}"
+                aria-selected="false">Plot-{{loop.index}}</button>
             </li>
             {% endfor %}
           </ul>
@@ -131,7 +135,7 @@
                       <li>Wirelength: {{output.wirelength}}</li>
                       <li>Timestamp: {{output.timestamp}}</li>
                     </ul>
-                  <a href="/download/{{output.unique_name}}" class="btn btn-primary" >Download Output</a>
+                    <a href="/download/{{output.unique_name}}" class="btn btn-primary">Download Output</a>
                   </span>
                 </div>
               </div>
@@ -157,6 +161,30 @@
   </div>
 </div>
 
+</div>
+
+<div class="modal fade" id="plModal" tabindex="-1" aria-labelledby="plModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="plModalLabel">Legend</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group">
+          <li class="list-group-item bg-white text-dark">Congestion = 0%</li>
+          <li class="list-group-item bg-primary text-white">Congestion &le; 25%</li>
+          <li class="list-group-item bg-info text-dark">Congestion &le; 50%</li>
+          <li class="list-group-item bg-success text-white">Congestion &le; 75%</li>
+          <li class="list-group-item bg-warning text-dark">Congestion &le; 100%</li>
+          <li class="list-group-item bg-danger text-white">Overflow</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script type="text/javascript" src="{{ url_for('static', filename='scripts/ajax.js')}}"></script>
