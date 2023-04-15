@@ -16,38 +16,31 @@ $(document).ready(function () {
     $("#submit-netlist").prop("disabled", true);
   });
 
-  $("#submit-netlist").on("click", function (e) {
+  $("#netlist-input-form").on("submit", function (e) {
+    e.preventDefault();
+    var netlist_input_data = new FormData();
+    let netlist_name;
     if ($("#inputFile")[0].files.length > 0) {
-      var netlist_input_data = new FormData($("#netlist-input-form")[0]);
-      var netlist_name = $("#inputFile")[0].files[0].name;
+      netlist_name = $("#inputFile")[0].files[0].name;
+      netlist_input_data.append("input-file", $("#inputFile")[0].files[0]);
     } else {
       let selected_netlist = parseInt($("#sample-netlist-select").val());
-      var netlist_name;
-      switch (selected_netlist) {
-        case 1:
-          netlist_name = "example";
-          break;
-        case 2:
-          netlist_name = "ibm01.modified";
-          break;
-        case 3:
-          netlist_name = "ibm02.modified";
-          break;
-        case 4:
-          netlist_name = "ibm03.modified";
-          break;
-        case 5:
-          netlist_name = "ibm04.modified";
-          break;
-        default:
-          netlist_name = "example";
-          break;
-      }
-      var netlist_input_data = "testcase/" + netlist_name + ".txt";
+      netlist_name = [
+        "example",
+        "ibm01.modified",
+        "ibm02.modified",
+        "ibm03.modified",
+        "ibm04.modified",
+      ][selected_netlist - 1];
+      netlist_name = "testcase/" + netlist_name + ".txt";
+      netlist_input_data.append("sample-netlist-select", netlist_name);
     }
-    var curr_count = ++netlist_count;
+
     update_job_monitor(netlist_name, curr_count);
-    console.log(netlist_input_data);
+    var curr_count = ++netlist_count;
+    netlist_input_data.append("algorithm-select", $("#algorithm-select").val());
+    netlist_input_data.append("seed-input", $("#seed-input").val());
+
     $.ajax({
       data: netlist_input_data,
       type: "POST",
@@ -61,7 +54,6 @@ $(document).ready(function () {
         result_cache_list.push({ netlist_name, result });
       },
     });
-    e.preventDefault();
   });
 
   $("#sample-netlist-select, #inputFile").change(function () {
