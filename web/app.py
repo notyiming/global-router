@@ -129,29 +129,27 @@ def download(filename):
 
 @app.route("/dashboard", methods=["POST", "GET"])
 def dashboard():
-    """Lauch User Dashboard"""
+    """Launch User Dashboard"""
     encoded_email = base64.urlsafe_b64encode(
         session["user"].encode()).decode().rstrip("=")
     if "user" not in session:
         return redirect("/login")
 
     if request.method == "POST":
-        if not request.files:
-            netlist_file = (request.get_data().decode())
-            file_basename = Path(netlist_file).stem
-
-        else:
-            if "inputFile" not in request.files:
-                return redirect("/dashboard")
-            file = request.files["inputFile"]
-            if not file.filename:
-                return redirect("/dashboard")
-            if file and _allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        if request.files:
+            input_file = request.files.get("inputFile", None)
+            if input_file and _allowed_file(input_file.filename):
+                filename = secure_filename(input_file.filename)
                 netlist_file = os.path.join(
                     app.config["UPLOAD_FOLDER"], filename)
-                file.save(netlist_file)
+                input_file.save(netlist_file)
+                file_basename = Path(netlist_file).stem
+            else:
+                return redirect("/dashboard")
+
+        else:
+            netlist_file = (request.get_data().decode())
+            file_basename = Path(netlist_file).stem
 
         file_basename = Path(netlist_file).stem
 
@@ -165,15 +163,15 @@ def dashboard():
         formatted_timenow = timenow.strftime('%Y-%m-%d %H:%M:%S')
         unix_timenow = int(timenow.timestamp())
 
-        result = {}
-        result["netlist_details"] = netlist_details
-        result["name"] = file_basename
-        result["overflow"] = overflow
-        result["wirelength"] = wirelength
-        result["timestamp"] = formatted_timenow
-        result["unique_name"] = f"{file_basename}_{unix_timenow}"
-        result["fig_html"] = gr.plot_congestion.callback(
-            f"output/{file_basename}.out.fig")
+        result = {
+            "netlist_details": netlist_details,
+            "name": file_basename,
+            "overflow": overflow,
+            "wirelength": wirelength,
+            "timestamp": formatted_timenow,
+            "unique_name": f"{file_basename}_{unix_timenow}",
+            "fig_html": gr.plot_congestion.callback(f"output/{file_basename}.out.fig")
+        }
 
         db.child("users").child(encoded_email).child("outputs").push(result)
         storage.child(
