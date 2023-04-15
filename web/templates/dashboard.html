@@ -36,32 +36,71 @@
     <div class="col-xl-4 p-4">
       <div class="card mb-3">
         <div class="card-header">
-          <h3 class="text-muted">Netlist Selection</h3>
+          <h3 class="text-muted">Netlist & Algorithm Selection</h3>
         </div>
         <div class="card-body">
-          <form action="/dashboard" id="netlist-input-form" type="file" enctype="multipart/form-data">
-            <label class="form-label" for="inputFile">Upload input netlist file</label>
-            <div class="input-group mb-3">
-              <input type="file" class="form-control" id="inputFile" name="inputFile" accept=".txt" required />
-              <button type="submit" id="submit-netlist" class="input-group-text btn btn-primary">Submit Netlist</button>
+          <form id="netlist-input-form" type="file" enctype="multipart/form-data">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-check">
+                <label class="form-check-label" for="inputFileOption">
+                  Upload input netlist file
+                </label>
+                <input class="form-check-input" type="radio" name="inputFileOption" id="inputFileOption"
+                  value="inputFile">
+              </div>
+              <div class="mb-3">
+                <input disabled type="file" class="form-control" id="inputFile" name="inputFile" accept=".txt"
+                  required />
+              </div>
             </div>
-          </form>
 
-          <p style="text-align: center; font-size: 1.5em;">or</p>
-
-          <div class="input-group mb-3">
-            <select class="form-select form-select mb-3" required aria-label=".form-select example"
-              id="sample-netlist-select">
-              <option disabled selected>Select a sample netlist</option>
-              <option value="1">Example</option>
-              <option value="2">IBM01</option>
-              <option value="3">IBM02</option>
-              <option value="4">IBM03</option>
-              <option value="5">IBM04</option>
-            </select>
-            <button type="button" id="sample-netlist" class="input-group-text btn btn-primary mb-3" disabled>Submit
-              Netlist</button>
+            <div class="col-md-6">
+              <div class="form-check">
+                <label class="form-check-label" for="sampleFileOption">
+                  Select sample netlist file
+                </label>
+                <input class="form-check-input" type="radio" name="inputFileOption" id="sampleFileOption"
+                  value="sampleFile">
+              </div>
+              <div class="mb-3">
+                <select disabled class="form-select form-select mb-3" required aria-label=".form-select example"
+                  id="sample-netlist-select">
+                  <option disabled selected>Select a sample netlist</option>
+                  <option value="1">Example</option>
+                  <option value="2">IBM01</option>
+                  <option value="3">IBM02</option>
+                  <option value="4">IBM03</option>
+                  <option value="5">IBM04</option>
+                </select>
+              </div>
+            </div>
           </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label" for="algorithm-select">Select Algorithm</label>
+                <select class="form-select form-select mb-3" required aria-label=".form-select example"
+                  id="algorithm-select">
+                  <option value="1" selected>Congestion Heuristic (Binary Heap)</option>
+                  <option value="2">Congestion Heuristic (Fibonacci Heap)</option>
+                  <option value="3">Naive BFS (Binary Heap)</option>
+                  <option value="4">Naive BFS (Fibonacci Heap)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label" for="seed-input">Enter Seed(Optional)</label>
+                <input type="text" class="form-control" id="seed-input" placeholder="Enter Allah Seed">
+              </div>
+            </div>
+          </div>
+          <button type="button" id="submit-netlist" class="input-group-text btn btn-primary mb-3" disabled>Submit
+            Netlist</button>
+          </form>
         </div>
       </div>
 
@@ -173,11 +212,11 @@
       <div class="modal-body">
         <ul class="list-group">
           <li class="list-group-item bg-white text-dark">Congestion = 0%</li>
-          <li class="list-group-item bg-primary text-white">Congestion &le; 25%</li>
-          <li class="list-group-item bg-info text-dark">Congestion &le; 50%</li>
-          <li class="list-group-item bg-success text-white">Congestion &le; 75%</li>
-          <li class="list-group-item bg-warning text-dark">Congestion &le; 100%</li>
-          <li class="list-group-item bg-danger text-white">Overflow</li>
+          <li class="list-group-item text-white" style="background-color: blue;">Congestion &le; 25%</li>
+          <li class="list-group-item text-dark" style="background-color: cyan;">Congestion &le; 50%</li>
+          <li class="list-group-item text-white" style="background-color: green;">Congestion &le; 75%</li>
+          <li class="list-group-item text-dark" style="background-color: yellow;">Congestion &le; 100%</li>
+          <li class="list-group-item text-white" style="background-color: red;">Overflow (Congestion &gt; 100%)</li>
         </ul>
       </div>
       <div class="modal-footer">

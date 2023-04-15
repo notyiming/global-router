@@ -1,127 +1,138 @@
 var result_cache_list = [];
-var netlist_count = $('#netlist-tabs li').length;
+var netlist_count = $("#netlist-tabs li").length;
 
 $(document).ready(function () {
+  $("#inputFileOption").click(function () {
+    $("#inputFile").prop("disabled", false);
+    $("#sample-netlist-select")
+      .prop("disabled", true)
+      .val("Select a sample netlist");
+    $("#submit-netlist").prop("disabled", true);
+  });
 
-    $('#netlist-input-form').on('submit', function (e) {
-        var netlist_input_data = new FormData($('#netlist-input-form')[0]);
-        var netlist_name = $('#inputFile')[0].files[0].name;
-        var curr_count = ++netlist_count;
-        update_job_monitor(netlist_name, curr_count);
-        $.ajax({
-            data: netlist_input_data,
-            type: 'POST',
-            url: '/dashboard',
-            contentType: false,
-            cache: false,
-            processData: false,
-            async: true,
-            success: function (result) {
-                ready_job_state(curr_count, result["timestamp"]);
-                result_cache_list.push({ netlist_name, result });
-                console.log(result_cache_list);
-            }
-        })
-        e.preventDefault();
+  $("#sampleFileOption").click(function () {
+    $("#sample-netlist-select").prop("disabled", false);
+    $("#inputFile").prop("disabled", true).val("");
+    $("#submit-netlist").prop("disabled", true);
+  });
+
+  $("#submit-netlist").on("click", function (e) {
+    if ($("#inputFile")[0].files.length > 0) {
+      var netlist_input_data = new FormData($("#netlist-input-form")[0]);
+      var netlist_name = $("#inputFile")[0].files[0].name;
+    } else {
+      let selected_netlist = parseInt($("#sample-netlist-select").val());
+      var netlist_name;
+      switch (selected_netlist) {
+        case 1:
+          netlist_name = "example";
+          break;
+        case 2:
+          netlist_name = "ibm01.modified";
+          break;
+        case 3:
+          netlist_name = "ibm02.modified";
+          break;
+        case 4:
+          netlist_name = "ibm03.modified";
+          break;
+        case 5:
+          netlist_name = "ibm04.modified";
+          break;
+        default:
+          netlist_name = "example";
+          break;
+      }
+      var netlist_input_data = "testcase/" + netlist_name + ".txt";
+    }
+    var curr_count = ++netlist_count;
+    update_job_monitor(netlist_name, curr_count);
+    console.log(netlist_input_data);
+    $.ajax({
+      data: netlist_input_data,
+      type: "POST",
+      url: "/dashboard",
+      contentType: false,
+      cache: false,
+      processData: false,
+      async: true,
+      success: function (result) {
+        ready_job_state(curr_count, result["timestamp"]);
+        result_cache_list.push({ netlist_name, result });
+      },
     });
+    e.preventDefault();
+  });
 
-    $('#sample-netlist').on('click', function (e) {
-        var selected_netlist = parseInt($('#sample-netlist-select').val());
-        let netlist_name;
-        switch (selected_netlist) {
-            case 1:
-                netlist_name = "example";
-                break;
-            case 2:
-                netlist_name = "ibm01.modified";
-                break;
-            case 3:
-                netlist_name = "ibm02.modified";
-                break;
-            case 4:
-                netlist_name = "ibm03.modified";
-                break;
-            case 5:
-                netlist_name = "ibm04.modified";
-                break;
-            default:
-                netlist_name = "example";
-                break;
-        }
-        var curr_count = ++netlist_count;
-        update_job_monitor(netlist_name, curr_count);
-        $.ajax({
-            data: 'testcase/' + netlist_name + ".txt",
-            type: 'POST',
-            url: '/dashboard',
-            contentType: false,
-            success: function (result) {
-                ready_job_state(curr_count, result["timestamp"]);
-                result_cache_list.push({ netlist_name, result });
-                console.log(result_cache_list);
-            }
-        })
-        e.preventDefault();
-    });
-
-    $('#sample-netlist-select').change(function () {
-        $('#sample-netlist').removeAttr('disabled');
-    })
+  $("#sample-netlist-select, #inputFile").change(function () {
+    $("#submit-netlist").removeAttr("disabled");
+  });
 });
 
 function ready_job_state(id, timestamp) {
-    $("#netlist-" + id).find("td button").removeAttr("disabled");
-    $("#netlist-" + id + " .routing-status").text("Ready").css("color", "green");
-    $("#netlist-" + id + "-timestamp").text(timestamp);
+  $("#netlist-" + id)
+    .find("td button")
+    .removeAttr("disabled");
+  $("#netlist-" + id + " .routing-status")
+    .text("Ready")
+    .css("color", "green");
+  $("#netlist-" + id + "-timestamp").text(timestamp);
 }
 
 function update_view(netlist_name, result, id) {
-    var ld = result["netlist_details"];
-    var gridhor = ld["grid_hor"];
-    var gridver = ld["grid_ver"];
-    var vercap = ld["ver_cap"];
-    var horcap = ld["hor_cap"];
-    var netlist_size = ld["netlist_size"];
-    var overflow = result["overflow"];
-    var wirelength = result["wirelength"];
-    var timestamp = result["timestamp"];
-    var unique_name = result["unique_name"];
-    $('#no-netlist-provided-span').attr("hidden", "true");
-    $('#netlist-name-' + id).html("Name: " + netlist_name);
-    $('#grid-size-' + id).html("Grid: " + gridhor + " x " + gridver);
-    $('#horcap-' + id).html("Horizontal Capacity: " + horcap);
-    $('#vercap-' + id).html("Vertical Capacity: " + vercap);
-    $('#netlist-size-' + id).html("Netlist Size: " + netlist_size);
-    $('#overflow-' + id).html("Overflow: " + overflow);
-    $('#wirelength-' + id).html("Wirelength: " + wirelength);
-    $('#timestamp-' + id).html("Timestamp: " + timestamp);
-    $('#download-output-' + id).attr("href", "download/" + unique_name);
+  var ld = result["netlist_details"];
+  var gridhor = ld["grid_hor"];
+  var gridver = ld["grid_ver"];
+  var vercap = ld["ver_cap"];
+  var horcap = ld["hor_cap"];
+  var netlist_size = ld["netlist_size"];
+  var overflow = result["overflow"];
+  var wirelength = result["wirelength"];
+  var timestamp = result["timestamp"];
+  var unique_name = result["unique_name"];
+  $("#no-netlist-provided-span").attr("hidden", "true");
+  $("#netlist-name-" + id).html("Name: " + netlist_name);
+  $("#grid-size-" + id).html("Grid: " + gridhor + " x " + gridver);
+  $("#horcap-" + id).html("Horizontal Capacity: " + horcap);
+  $("#vercap-" + id).html("Vertical Capacity: " + vercap);
+  $("#netlist-size-" + id).html("Netlist Size: " + netlist_size);
+  $("#overflow-" + id).html("Overflow: " + overflow);
+  $("#wirelength-" + id).html("Wirelength: " + wirelength);
+  $("#timestamp-" + id).html("Timestamp: " + timestamp);
+  $("#download-output-" + id).attr("href", "download/" + unique_name);
 }
 
 function view_visual(id) {
-    netlist = result_cache_list[id]
-    netlist_name = netlist.netlist_name;
-    netlist_data = netlist.result;
-    $("#netlist-" + netlist_count).find("td button").attr("disabled", "disabled").text("Opened");
-    add_tab(netlist_data["fig_html"], netlist_count);
-    update_view(netlist_name, netlist_data, netlist_count);
+  netlist = result_cache_list[id];
+  netlist_name = netlist.netlist_name;
+  netlist_data = netlist.result;
+  $("#netlist-" + netlist_count)
+    .find("td button")
+    .attr("disabled", "disabled")
+    .text("Opened");
+  add_tab(netlist_data["fig_html"], netlist_count);
+  update_view(netlist_name, netlist_data, netlist_count);
 }
 
 function update_job_monitor(netlist_name, netlist_count) {
-    var jobMonitor = $('#job-monitor');
-    var newRowId = "netlist-" + netlist_count;
-    var newRow = '<tr id=' + newRowId + '><th scope="row">' + netlist_count + '</th>'
-    newRow += ('<td>' + netlist_name + '</td>');
-    newRow += ('<td class="routing-status">' + 'Routing' + '</td>');
-    newRow += ('<td id =' + newRowId + '-timestamp' + '> - </td>');
-    newRow += ('<td><button class="btn btn-primary" onclick="view_visual(' + result_cache_list.length + ')" disabled>View</button></td>');
-    jobMonitor.append(newRow);
+  var jobMonitor = $("#job-monitor");
+  var newRowId = "netlist-" + netlist_count;
+  var newRow =
+    "<tr id=" + newRowId + '><th scope="row">' + netlist_count + "</th>";
+  newRow += "<td>" + netlist_name + "</td>";
+  newRow += '<td class="routing-status">' + "Routing" + "</td>";
+  newRow += "<td id =" + newRowId + "-timestamp" + "> - </td>";
+  newRow +=
+    '<td><button class="btn btn-primary" onclick="view_visual(' +
+    result_cache_list.length +
+    ')" disabled>View</button></td>';
+  jobMonitor.append(newRow);
 }
 
 function add_tab(figHtml, id) {
-    var numTabs = id;
-    const newTabId = `tab-${numTabs}`;
-    const newTabContentHtml = `
+  var numTabs = id;
+  const newTabId = `tab-${numTabs}`;
+  const newTabContentHtml = `
     <div class="tab-pane fade" id="${newTabId}" role="tabpanel" aria-labelledby="${newTabId}-tab">
       <div class="row">
         <div id="plot-view" class="col-xl-8">${figHtml}</div>
@@ -143,22 +154,22 @@ function add_tab(figHtml, id) {
         </div>
       </div>
     </div>`;
-    const newTabHtml = `
+  const newTabHtml = `
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="${newTabId}-tab" data-bs-toggle="pill" data-bs-target="#${newTabId}" type="button" role="tab" aria-controls="${newTabId}" aria-selected="false">Plot-${numTabs}</button>
     </li>`;
-    if (numTabs === 1) {
-        const netlistTabsUL = `
+  if (numTabs === 1) {
+    const netlistTabsUL = `
       <ul class="nav nav-pills mb-3" id="netlist-tabs" role="tablist"></ul>
       <div class="tab-content" id="netlist-tabs-content"></div>`;
-        $('#output-view').removeClass('row');
-        $('#output-view').html(netlistTabsUL);
-        $('#netlist-tabs').append(newTabHtml);
-        $('#netlist-tabs-content').append(newTabContentHtml);
-        $('#' + newTabId).addClass('show active');
-        $('#' + newTabId + '-tab').addClass('active');
-    } else {
-        $('#netlist-tabs').append(newTabHtml);
-        $('#netlist-tabs-content').append(newTabContentHtml);
-    }
+    $("#output-view").removeClass("row");
+    $("#output-view").html(netlistTabsUL);
+    $("#netlist-tabs").append(newTabHtml);
+    $("#netlist-tabs-content").append(newTabContentHtml);
+    $("#" + newTabId).addClass("show active");
+    $("#" + newTabId + "-tab").addClass("active");
+  } else {
+    $("#netlist-tabs").append(newTabHtml);
+    $("#netlist-tabs-content").append(newTabContentHtml);
+  }
 }
