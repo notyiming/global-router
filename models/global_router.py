@@ -206,7 +206,7 @@ class GlobalRouter:
                 next_node_id = grid.get_node_id(next_coordinate)
 
                 # check if neighbor node coordinate is legal and if neighbor node is visited
-                if not grid.coordinate_is_legal(next_coordinate) or next_node_id in visited_nodes:
+                if next_node_id in visited_nodes or not grid.coordinate_is_legal(next_coordinate):
                     continue
 
                 next_node = Node(current_node, next_coordinate)
@@ -308,6 +308,8 @@ class GlobalRouter:
     def route(self):
         """main global routing logic"""
         random.shuffle(self.netlist)
+        # print(random.getstate())
+        # return
         self.netlist.sort(key=lambda x: x.hpwl)
 
         match self.algorithm:
