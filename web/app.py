@@ -167,7 +167,12 @@ def dashboard():
             "wirelength": wirelength,
             "timestamp": formatted_timenow,
             "unique_name": f"{file_basename}_{unix_timenow}",
-            "fig_html": gr.plot_congestion.callback(f"output/{file_basename}.out.fig")
+            "fig_html": gr.plot_congestion.callback(f"output/{file_basename}.out.fig"),
+            "algorithm": [
+                "Best First Search (Binary Heap)",
+                "Best First Search (Fibonacci Heap)",
+                "Breadth First Search"
+            ][algorithm - 1]
         }
 
         db.child("users").child(encoded_email).child("outputs").push(result)
