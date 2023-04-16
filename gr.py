@@ -21,6 +21,8 @@ def gr_cli():
 @gr_cli.command(short_help="Route the netlist")
 @click.argument("input_file")
 @click.argument("output_file")
+@click.option("-a", "--algorithm", default=1, help="1. Best First Search 2. Breadth First Search", type=int)
+@click.option("-s", "--seed", default=-1, help="Random seed", type=int)
 def global_route(input_file: str, output_file: str, algorithm: int, seed: int):
     """Global Route a netlist file and generate a routed output
     \f
