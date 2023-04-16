@@ -108,8 +108,5 @@ class Grid:
         Returns:
             bool: coordinate of next node is legal or not
         """
-        if next_coordinate[0] < 0 or next_coordinate[0] >= self.grid_horizontal_size:
-            return False
-        if next_coordinate[1] < 0 or next_coordinate[1] >= self.grid_vertical_size:
-            return False
-        return True
+        x, y = next_coordinate
+        return 0 <= x < self.grid_horizontal_size and 0 <= y < self.grid_vertical_size
