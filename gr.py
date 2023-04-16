@@ -71,9 +71,11 @@ def global_route(input_file: str, output_file: str, algorithm: int, seed: int):
         f"Best Wirelength: {min_wirelength}\n"
         "==============================\n")
 
+    num_of_reroutes_attempts = 0 if algorithm == 3 else 10
+
     if min_overflow > 0:
         num_of_reroutes = 0
-        while num_of_reroutes < 10 and min_overflow > 0:
+        while num_of_reroutes < num_of_reroutes_attempts and min_overflow > 0:
             gr_logger.info(f"Rip-up and reroute #{num_of_reroutes + 1}:")
             new_min_overflow, new_min_wirelength = global_routers[best_gr_index].rip_up_and_reroute(
             )
