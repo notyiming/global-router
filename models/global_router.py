@@ -23,7 +23,7 @@ class GlobalRouter:
         self.netlist: List[Net] = []
         self.overflow: int = 0  # total number of overflow in the layout
         self.wirelength: int = 0  # total wirelength in the layout
-        self.seed: int = seed # seed for random number generator
+        self.seed: int = seed  # seed for random number generator
         self.algorithm: int = algorithm
 
     @util.log_func
@@ -119,10 +119,10 @@ class GlobalRouter:
         start_pin = net.net_pins_coordinates[0]
         end_pin = net.net_pins_coordinates[1]
 
-        node = Node(None, start_pin)
-        node.node_id = grid.get_node_id(node.coordinates)
+        start_node = Node(None, start_pin)
+        start_node.node_id = grid.get_node_id(start_node.coordinates)
 
-        queue = deque([node])
+        queue = deque([start_node])
 
         visited_nodes = set()
 
@@ -146,7 +146,7 @@ class GlobalRouter:
                 next_node_id = grid.get_node_id(next_coordinate)
 
                 # check if neighbor node coordinate is legal and if neighbor node is visited
-                if not grid.coordinate_is_legal(next_coordinate) or next_node_id in visited_nodes:
+                if next_node_id in visited_nodes or not grid.coordinate_is_legal(next_coordinate):
                     continue
 
                 next_node = Node(current_node, next_coordinate)
@@ -162,7 +162,7 @@ class GlobalRouter:
 
     def connect_net_best_first_search_heapq(self, net: Net):
         """Route a two-pin net with Best-First Search
-        
+
         The priority queue (binary heap) stores the nodes to be 
         expanded in ascending order of their congestion heuristic
         cost. At each step, the algorithm chooses the node with 
@@ -177,12 +177,12 @@ class GlobalRouter:
         start_pin = net.net_pins_coordinates[0]
         end_pin = net.net_pins_coordinates[1]
 
-        node = Node(None, start_pin)
-        node.node_id = grid.get_node_id(node.coordinates)
+        start_node = Node(None, start_pin)
+        start_node.node_id = grid.get_node_id(start_node.coordinates)
 
         priority_queue = []
         heapq.heapify(priority_queue)
-        heapq.heappush(priority_queue, node)
+        heapq.heappush(priority_queue, start_node)
 
         visited_nodes = set()
 
@@ -226,7 +226,7 @@ class GlobalRouter:
 
     def connect_net_best_first_search_fibheap(self, net: Net):
         """Route a two-pin net with Best-First Search
-        
+
         The priority queue (Fibonacci heap) stores the nodes to be 
         expanded in ascending order of their congestion heuristic
         cost. At each step, the algorithm chooses the node with 
@@ -241,11 +241,11 @@ class GlobalRouter:
         start_pin = net.net_pins_coordinates[0]
         end_pin = net.net_pins_coordinates[1]
 
-        node = Node(None, start_pin)
-        node.node_id = grid.get_node_id(node.coordinates)
+        start_node = Node(None, start_pin)
+        start_node.node_id = grid.get_node_id(start_node.coordinates)
 
         heap = fibheap.makefheap()
-        fibheap.fheappush(heap, node)
+        fibheap.fheappush(heap, start_node)
 
         visited_nodes = set()
         best_path = None
@@ -264,17 +264,20 @@ class GlobalRouter:
             for i in range(4):  # bfs (all direction)
                 next_coordinate = self.get_next_coordinate(
                     current_node.coordinates, i)
-                if not grid.coordinate_is_legal(next_coordinate):
+                next_node_id = grid.get_node_id(next_coordinate)
+
+                # check if neighbor node coordinate is legal and if neighbor node is visited
+                if next_node_id in visited_nodes or not grid.coordinate_is_legal(next_coordinate):
                     continue
+
                 next_node = Node(current_node, next_coordinate)
+
+                # set node ID
+                next_node.node_id = next_node_id
 
                 # set edge ID
                 next_node.edge_id = grid.get_edge_id(
                     current_node.coordinates, i)
-
-                # set node ID
-                next_node.node_id = grid.get_node_id(
-                    next_node.coordinates)  # or next_coordinates?
 
                 # set cost
                 next_node.cost = current_node.cost + \
