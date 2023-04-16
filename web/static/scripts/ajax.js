@@ -38,8 +38,14 @@ $(document).ready(function () {
 
     var curr_count = ++netlist_count;
     update_job_monitor(netlist_name, curr_count);
-    netlist_input_data.append("algorithm-select", parseInt($("#algorithm-select").val()));
-    netlist_input_data.append("seed-input", parseInt($("#seed-input").val()) || -1);
+    netlist_input_data.append(
+      "algorithm-select",
+      parseInt($("#algorithm-select").val())
+    );
+    netlist_input_data.append(
+      "seed-input",
+      parseInt($("#seed-input").val()) || -1
+    );
 
     $.ajax({
       data: netlist_input_data,
@@ -73,27 +79,18 @@ function ready_job_state(id, timestamp) {
 
 function update_view(netlist_name, result, id) {
   var ld = result["netlist_details"];
-  var gridhor = ld["grid_hor"];
-  var gridver = ld["grid_ver"];
-  var vercap = ld["ver_cap"];
-  var horcap = ld["hor_cap"];
-  var netlist_size = ld["netlist_size"];
-  var overflow = result["overflow"];
-  var wirelength = result["wirelength"];
-  var timestamp = result["timestamp"];
-  var algorithm = result["algorithm"];
-  var unique_name = result["unique_name"];
   $("#no-netlist-provided-span").attr("hidden", "true");
   $("#netlist-name-" + id).html("Name: " + netlist_name);
-  $("#grid-size-" + id).html("Grid: " + gridhor + " x " + gridver);
-  $("#horcap-" + id).html("Horizontal Capacity: " + horcap);
-  $("#vercap-" + id).html("Vertical Capacity: " + vercap);
-  $("#netlist-size-" + id).html("Netlist Size: " + netlist_size);
-  $("#overflow-" + id).html("Overflow: " + overflow);
-  $("#wirelength-" + id).html("Wirelength: " + wirelength);
-  $("#timestamp-" + id).html("Timestamp: " + timestamp);
-  $("#algorithm-" + id).html("Algorithm: " + algorithm);
-  $("#download-output-" + id).attr("href", "download/" + unique_name);
+  $("#grid-size-" + id).html("Grid: " + ld.gridhor + " x " + ld.gridver);
+  $("#horcap-" + id).html("Horizontal Capacity: " + ld.horcap);
+  $("#vercap-" + id).html("Vertical Capacity: " + ld.vercap);
+  $("#netlist-size-" + id).html("Netlist Size: " + ld.netlist_size);
+  $("#overflow-" + id).html("Overflow: " + result.overflow);
+  $("#wirelength-" + id).html("Wirelength: " + result.wirelength);
+  $("#timestamp-" + id).html("Timestamp: " + result.timestamp);
+  $("#algorithm-" + id).html("Algorithm: " + result.algorithm);
+  $("#seed-" + id).html("Seed: " + result.seed);
+  $("#download-output-" + id).attr("href", "download/" + result.unique_name);
 }
 
 function view_visual(id) {
@@ -143,6 +140,7 @@ function add_tab(figHtml, id) {
               <li id="wirelength-${numTabs}"></li>
               <li id="timestamp-${numTabs}"></li>
               <li id="algorithm-${numTabs}"></li>
+              <li id="seed-${numTabs}"></li>
             </ul>
             <a href="#" id="download-output-${numTabs}" class="btn btn-primary">Download Output</a>
           </span>

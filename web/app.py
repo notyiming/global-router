@@ -172,7 +172,8 @@ def dashboard():
                 "Best First Search (Binary Heap)",
                 "Best First Search (Fibonacci Heap)",
                 "Breadth First Search"
-            ][algorithm - 1]
+            ][algorithm - 1],
+            "seed": "N/A" if seed == -1 else seed
         }
 
         db.child("users").child(encoded_email).child("outputs").push(result)
