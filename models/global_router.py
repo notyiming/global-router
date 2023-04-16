@@ -158,10 +158,6 @@ class GlobalRouter:
                 next_node.edge_id = grid.get_edge_id(
                     current_node.coordinates, i)
 
-                # set cost
-                # next_node.cost = current_node.cost + \
-                #     grid.get_edge_cost(next_node.edge_id, False)
-
                 queue.append(next_node)
 
     def connect_net_best_first_search_heapq(self, net: Net):
