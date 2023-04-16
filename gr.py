@@ -21,7 +21,7 @@ def gr_cli():
 @gr_cli.command(short_help="Route the netlist")
 @click.argument("input_file")
 @click.argument("output_file")
-def global_route(input_file: str, output_file: str):
+def global_route(input_file: str, output_file: str, algorithm: int, seed: int):
     """Global Route a netlist file and generate a routed output
     \f
 
@@ -29,7 +29,7 @@ def global_route(input_file: str, output_file: str):
         input_file (str): Path to netlist input file
         output_file (str): Path to generated output file
     """
-    global_router = GlobalRouter()
+    global_router = GlobalRouter(algorithm, seed)
     netlist_details = global_router.parse_input(input_file)
     gr_logger.info(
         "\nLayout and Netlist Details\n"
@@ -99,7 +99,7 @@ def global_route(input_file: str, output_file: str):
 
 
 def _run_global_route(router: GlobalRouter):
-    router.global_route()
+    router.route()
     return router
 
 

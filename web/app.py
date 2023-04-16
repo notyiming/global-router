@@ -136,28 +136,25 @@ def dashboard():
         return redirect("/login")
 
     if request.method == "POST":
-        if request.files:
-            input_file = request.files.get("inputFile", None)
-            if input_file and _allowed_file(input_file.filename):
-                filename = secure_filename(input_file.filename)
-                netlist_file = os.path.join(
-                    app.config["UPLOAD_FOLDER"], filename)
-                input_file.save(netlist_file)
-                file_basename = Path(netlist_file).stem
-            else:
-                return redirect("/dashboard")
-
-        else:
-            netlist_file = (request.get_data().decode())
+        input_file = request.files.get("input-file", None)
+        algorithm = int(request.form.get("algorithm-select"))
+        seed = int(request.form.get("seed-input"))
+        if input_file:
+            filename = secure_filename(input_file.filename)
+            netlist_file = os.path.join(
+                app.config["UPLOAD_FOLDER"], filename)
+            input_file.save(netlist_file)
             file_basename = Path(netlist_file).stem
 
-        file_basename = Path(netlist_file).stem
+        else:
+            netlist_file = request.form.get("sample-netlist-select")
+            file_basename = Path(netlist_file).stem
 
         # if output directory does not exist, create it
         os.makedirs("output", exist_ok=True)
 
         netlist_details, overflow, wirelength = gr.global_route.callback(
-            netlist_file, f"output/{file_basename}.out")
+            netlist_file, f"output/{file_basename}.out", algorithm, seed)
 
         timenow = datetime.now()
         formatted_timenow = timenow.strftime('%Y-%m-%d %H:%M:%S')
@@ -187,11 +184,6 @@ def dashboard():
     outputs = db.child("users").child(
         encoded_email).child("outputs").get().val()
     return render_template("dashboard.html", user=user, outputs=outputs.values() if outputs else [])
-
-
-def _allowed_file(filename: str) -> bool:
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() == "txt"
 
 
 if __name__ == '__main__':

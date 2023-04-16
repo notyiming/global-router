@@ -1,5 +1,6 @@
 """Global Router Module"""
 
+from collections import deque
 import heapq
 import os
 import random
@@ -17,11 +18,13 @@ from util import util
 class GlobalRouter:
     """Global Router class, handles the logic of the global router"""
 
-    def __init__(self) -> None:
+    def __init__(self, algorithm: int, seed: int) -> None:
         self.grid: Grid = None
         self.netlist: List[Net] = []
         self.overflow: int = 0  # total number of overflow in the layout
         self.wirelength: int = 0  # total wirelength in the layout
+        self.seed: int = seed # seed for random number generator
+        self.algorithm: int = algorithm
 
     @util.log_func
     def dump_result(self, output_file_path: str) -> None:
@@ -60,11 +63,18 @@ class GlobalRouter:
 
         random.shuffle(overflow_nets)
         # overflow_nets.sort(key=lambda x: x.hpwl)
+        match self.algorithm:
+            case 1:
+                routing_algorithm = self.connect_net_best_first_search_heapq
+            case 2:
+                routing_algorithm = self.connect_net_best_first_search_fibheap
+            case 3:
+                routing_algorithm = self.connect_net_breadth_first_search
 
         with click.progressbar(overflow_nets, label="Performing Rip-up and Reroute") as nets:
             for net in nets:
                 grid.update_demand(net.path, False)  # removing the path
-                self.route_two_pin_net(net)  # rerouting the path
+                routing_algorithm(net)  # rerouting the path
                 grid.update_demand(net.path, True)  # replacing the path
 
         self.update_overflow_wirelength()
@@ -95,8 +105,74 @@ class GlobalRouter:
             case 3:
                 return current_node_coordinate[0] - 1, current_node_coordinate[1]
 
-    def route_two_pin_net(self, net: Net):
-        """Route a two-pin net (BFS)
+    def connect_net_breadth_first_search(self, net: Net):
+        """Route a two-pin net with Breadth-First Search
+
+        This will only create L-shaped paths for all nets.
+        This is a terrible algorithm as it doesn't take
+        congestion into account and might create a lot of overflow.
+
+        Args:
+            net (Net): two-pin net
+        """
+        grid = self.grid
+        start_pin = net.net_pins_coordinates[0]
+        end_pin = net.net_pins_coordinates[1]
+
+        node = Node(None, start_pin)
+        node.node_id = grid.get_node_id(node.coordinates)
+
+        queue = deque([node])
+
+        visited_nodes = set()
+
+        while queue:
+            current_node: Node = queue.popleft()
+
+            # base case: current node is the end pin
+            if current_node.coordinates == end_pin:
+                net.path = Path(current_node)
+                break
+
+            # skip if current node is already visited
+            if current_node.node_id in visited_nodes:
+                continue
+            visited_nodes.add(current_node.node_id)
+
+            # add neighbors in all directions to priority queue
+            for i in range(4):
+                next_coordinate = self.get_next_coordinate(
+                    current_node.coordinates, i)
+                next_node_id = grid.get_node_id(next_coordinate)
+
+                # check if neighbor node coordinate is legal and if neighbor node is visited
+                if not grid.coordinate_is_legal(next_coordinate) or next_node_id in visited_nodes:
+                    continue
+
+                next_node = Node(current_node, next_coordinate)
+
+                # set node ID
+                next_node.node_id = next_node_id
+
+                # set edge ID
+                next_node.edge_id = grid.get_edge_id(
+                    current_node.coordinates, i)
+
+                # set cost
+                # next_node.cost = current_node.cost + \
+                #     grid.get_edge_cost(next_node.edge_id, False)
+
+                queue.append(next_node)
+
+    def connect_net_best_first_search_heapq(self, net: Net):
+        """Route a two-pin net with Best-First Search
+        
+        The priority queue (binary heap) stores the nodes to be 
+        expanded in ascending order of their congestion heuristic
+        cost. At each step, the algorithm chooses the node with 
+        the lowest cost and expands it by considering all of its 
+        neighbors.
+
 
         Args:
             net (Net): two-pin net
@@ -133,7 +209,7 @@ class GlobalRouter:
                     current_node.coordinates, i)
                 next_node_id = grid.get_node_id(next_coordinate)
 
-                # check if neighbor node coordinate is legal and if neighbor node is visited 
+                # check if neighbor node coordinate is legal and if neighbor node is visited
                 if not grid.coordinate_is_legal(next_coordinate) or next_node_id in visited_nodes:
                     continue
 
@@ -152,8 +228,15 @@ class GlobalRouter:
 
                 heapq.heappush(priority_queue, next_node)
 
-    def route_two_pin_net_fibheap(self, net: Net):
-        """Route a two-pin net (Fibonacci Heap)
+    def connect_net_best_first_search_fibheap(self, net: Net):
+        """Route a two-pin net with Best-First Search
+        
+        The priority queue (Fibonacci heap) stores the nodes to be 
+        expanded in ascending order of their congestion heuristic
+        cost. At each step, the algorithm chooses the node with 
+        the lowest cost and expands it by considering all of its 
+        neighbors.
+
 
         Args:
             net (Net): two-pin net
@@ -226,14 +309,22 @@ class GlobalRouter:
 
     @util.timeit
     @util.log_func
-    def global_route(self):
+    def route(self):
         """main global routing logic"""
         random.shuffle(self.netlist)
         self.netlist.sort(key=lambda x: x.hpwl)
 
+        match self.algorithm:
+            case 1:
+                routing_algorithm = self.connect_net_best_first_search_heapq
+            case 2:
+                routing_algorithm = self.connect_net_best_first_search_fibheap
+            case 3:
+                routing_algorithm = self.connect_net_breadth_first_search
+
         with click.progressbar(self.netlist, label="Routing the netlist") as netlist:
             for net in netlist:
-                self.route_two_pin_net(net)
+                routing_algorithm(net)
                 self.grid.update_demand(net.path, True)
 
         self.update_overflow_wirelength()
@@ -296,10 +387,11 @@ class GlobalRouter:
                 self.netlist.append(net)
             gr_logger.info(
                 f"{input_file_path} parsed successfully, data structures created")
-            netlist_details = {}
-            netlist_details["grid_hor"] = grid_horizontal_size
-            netlist_details["grid_ver"] = grid_vertical_size
-            netlist_details["ver_cap"] = vertical_capacity
-            netlist_details["hor_cap"] = horizontal_capacity
-            netlist_details["netlist_size"] = netlist_size
+            netlist_details = {
+                "grid_hor": grid_horizontal_size,
+                "grid_ver": grid_vertical_size,
+                "ver_cap": vertical_capacity,
+                "hor_cap": horizontal_capacity,
+                "netlist_size": netlist_size
+            }
             return netlist_details

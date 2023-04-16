@@ -32,14 +32,14 @@ $(document).ready(function () {
         "ibm03.modified",
         "ibm04.modified",
       ][selected_netlist - 1];
-      netlist_name = "testcase/" + netlist_name + ".txt";
-      netlist_input_data.append("sample-netlist-select", netlist_name);
+      netlist_path = "testcase/" + netlist_name + ".txt";
+      netlist_input_data.append("sample-netlist-select", netlist_path);
     }
 
-    update_job_monitor(netlist_name, curr_count);
     var curr_count = ++netlist_count;
-    netlist_input_data.append("algorithm-select", $("#algorithm-select").val());
-    netlist_input_data.append("seed-input", $("#seed-input").val());
+    update_job_monitor(netlist_name, curr_count);
+    netlist_input_data.append("algorithm-select", parseInt($("#algorithm-select").val()));
+    netlist_input_data.append("seed-input", parseInt($("#seed-input").val()) || -1);
 
     $.ajax({
       data: netlist_input_data,
