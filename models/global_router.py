@@ -4,8 +4,7 @@ from collections import deque
 import heapq
 import os
 import random
-from typing import List, Tuple
-import fibheap
+from typing import Dict, List, Tuple
 import click
 from models.net import Net
 from models.node import Node
@@ -53,7 +52,7 @@ class GlobalRouter:
 
     @util.timeit
     @util.log_func
-    def rip_up_and_reroute(self):
+    def rip_up_and_reroute(self) -> Tuple[int, int]:
         """rip up and reroute"""
         overflow_nets: List[Net] = []
         grid = self.grid
@@ -67,8 +66,6 @@ class GlobalRouter:
             case 1:
                 routing_algorithm = self.connect_net_best_first_search_heapq
             case 2:
-                routing_algorithm = self.connect_net_best_first_search_fibheap
-            case 3:
                 routing_algorithm = self.connect_net_breadth_first_search
 
         with click.progressbar(overflow_nets, label="Performing Rip-up and Reroute") as nets:
@@ -105,7 +102,7 @@ class GlobalRouter:
             case 3:
                 return current_node_coordinate[0] - 1, current_node_coordinate[1]
 
-    def connect_net_breadth_first_search(self, net: Net):
+    def connect_net_breadth_first_search(self, net: Net) -> None:
         """Route a two-pin net with Breadth-First Search
 
         This will only create L-shaped paths for all nets.
@@ -160,7 +157,7 @@ class GlobalRouter:
 
                 queue.append(next_node)
 
-    def connect_net_best_first_search_heapq(self, net: Net):
+    def connect_net_best_first_search_heapq(self, net: Net) -> None:
         """Route a two-pin net with Best-First Search
 
         The priority queue (binary heap) stores the nodes to be 
@@ -224,70 +221,7 @@ class GlobalRouter:
 
                 heapq.heappush(priority_queue, next_node)
 
-    def connect_net_best_first_search_fibheap(self, net: Net):
-        """Route a two-pin net with Best-First Search
-
-        The priority queue (Fibonacci heap) stores the nodes to be 
-        expanded in ascending order of their congestion heuristic
-        cost. At each step, the algorithm chooses the node with 
-        the lowest cost and expands it by considering all of its 
-        neighbors.
-
-
-        Args:
-            net (Net): two-pin net
-        """
-        grid = self.grid
-        start_pin = net.net_pins_coordinates[0]
-        end_pin = net.net_pins_coordinates[1]
-
-        start_node = Node(None, start_pin)
-        start_node.node_id = grid.get_node_id(start_node.coordinates)
-
-        heap = fibheap.makefheap()
-        fibheap.fheappush(heap, start_node)
-
-        visited_nodes = set()
-        best_path = None
-
-        while heap:
-            current_node = fibheap.fheappop(heap)
-
-            if current_node.node_id in visited_nodes:
-                continue
-            visited_nodes.add(current_node.node_id)
-
-            if current_node.coordinates == end_pin:
-                best_path = current_node
-                break
-
-            for i in range(4):  # bfs (all direction)
-                next_coordinate = self.get_next_coordinate(
-                    current_node.coordinates, i)
-                next_node_id = grid.get_node_id(next_coordinate)
-
-                # check if neighbor node coordinate is legal and if neighbor node is visited
-                if next_node_id in visited_nodes or not grid.coordinate_is_legal(next_coordinate):
-                    continue
-
-                next_node = Node(current_node, next_coordinate)
-
-                # set node ID
-                next_node.node_id = next_node_id
-
-                # set edge ID
-                next_node.edge_id = grid.get_edge_id(
-                    current_node.coordinates, i)
-
-                # set cost
-                next_node.cost = current_node.cost + \
-                    grid.get_edge_cost(next_node.edge_id)
-
-                fibheap.fheappush(heap, next_node)
-
-        net.path = Path(best_path)
-
-    def update_overflow_wirelength(self) -> Tuple[int, int]:
+    def update_overflow_wirelength(self) -> None:
         """Update overflow and wirelength for the layout"""
         total_overflow = 0
         total_wirelength = 0
@@ -308,19 +242,17 @@ class GlobalRouter:
 
     @util.timeit
     @util.log_func
-    def route(self):
+    def route(self) -> None:
         """main global routing logic"""
         random.shuffle(self.netlist)
-        # print(random.getstate())
-        # return
+        random_seed = random.getstate()[1][0]
+        self.seed = random_seed
         self.netlist.sort(key=lambda x: x.hpwl)
 
         match self.algorithm:
             case 1:
                 routing_algorithm = self.connect_net_best_first_search_heapq
             case 2:
-                routing_algorithm = self.connect_net_best_first_search_fibheap
-            case 3:
                 routing_algorithm = self.connect_net_breadth_first_search
 
         with click.progressbar(self.netlist, label="Routing the netlist") as netlist:
@@ -333,7 +265,7 @@ class GlobalRouter:
         gr_logger.info(f"Total Wirelength: {self.wirelength}")
         self.netlist.sort(key=lambda x: x.net_id)
 
-    def generate_congestion_output(self, output_file_name: str):
+    def generate_congestion_output(self, output_file_name: str) -> None:
         """Generate the congestion data for the output
 
         Args:
@@ -355,7 +287,7 @@ class GlobalRouter:
                 f"Congestion data generated into {output_file_name}.fig")
 
     @util.log_func
-    def parse_input(self, input_file_path: str) -> list[Net]:
+    def parse_input(self, input_file_path: str) -> Dict:
         """Parse the netlist input file
 
         Args:

@@ -153,7 +153,7 @@ def dashboard():
         # if output directory does not exist, create it
         os.makedirs("output", exist_ok=True)
 
-        netlist_details, overflow, wirelength = gr.global_route.callback(
+        netlist_details, global_router = gr.global_route.callback(
             netlist_file, f"output/{file_basename}.out", algorithm, seed)
 
         timenow = datetime.now()
@@ -163,17 +163,13 @@ def dashboard():
         result = {
             "netlist_details": netlist_details,
             "name": file_basename,
-            "overflow": overflow,
-            "wirelength": wirelength,
+            "overflow": global_router.overflow,
+            "wirelength": global_router.wirelength,
             "timestamp": formatted_timenow,
             "unique_name": f"{file_basename}_{unix_timenow}",
             "fig_html": gr.plot_congestion.callback(f"output/{file_basename}.out.fig"),
-            "algorithm": [
-                "Best First Search (Binary Heap)",
-                "Best First Search (Fibonacci Heap)",
-                "Breadth First Search"
-            ][algorithm - 1],
-            "seed": "N/A" if seed == -1 else seed
+            "algorithm": ["Best First Search","Breadth First Search"][algorithm - 1],
+            "seed": global_router.seed
         }
 
         db.child("users").child(encoded_email).child("outputs").push(result)

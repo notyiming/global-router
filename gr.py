@@ -4,6 +4,7 @@
 import copy
 import math
 import multiprocessing
+from typing import Dict, Tuple
 import click
 from matplotlib import patches, pyplot as plt
 import numpy as np
@@ -23,7 +24,7 @@ def gr_cli():
 @click.argument("output_file")
 @click.option("-a", "--algorithm", default=1, help="1. Best First Search 2. Breadth First Search", type=int)
 @click.option("-s", "--seed", default=-1, help="Random seed", type=int)
-def global_route(input_file: str, output_file: str, algorithm: int, seed: int):
+def global_route(input_file: str, output_file: str, algorithm: int, seed: int) -> Tuple[Dict, GlobalRouter]:
     """Global Route a netlist file and generate a routed output
     \f
 
@@ -73,7 +74,7 @@ def global_route(input_file: str, output_file: str, algorithm: int, seed: int):
         f"Best Wirelength: {min_wirelength}\n"
         "==============================\n")
 
-    num_of_reroutes_attempts = 0 if algorithm == 3 else 10
+    num_of_reroutes_attempts = 0 if algorithm == 2 else 10
 
     if min_overflow > 0:
         num_of_reroutes = 0
@@ -99,7 +100,7 @@ def global_route(input_file: str, output_file: str, algorithm: int, seed: int):
 
     global_routers[best_gr_index].dump_result(output_file)
     global_routers[best_gr_index].generate_congestion_output(output_file)
-    return (netlist_details, min_overflow, min_wirelength)
+    return (netlist_details, global_routers[best_gr_index])
 
 
 def _run_global_route(router: GlobalRouter):
