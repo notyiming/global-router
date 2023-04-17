@@ -38,14 +38,8 @@ $(document).ready(function () {
 
     var curr_count = ++netlist_count;
     update_job_monitor(netlist_name, curr_count);
-    netlist_input_data.append(
-      "algorithm-select",
-      parseInt($("#algorithm-select").val())
-    );
-    netlist_input_data.append(
-      "seed-input",
-      parseInt($("#seed-input").val()) || -1
-    );
+    netlist_input_data.append("algorithm-select", $("#algorithm-select").val());
+    netlist_input_data.append("seed-input", $("#seed-input").val());
 
     $.ajax({
       data: netlist_input_data,
@@ -81,9 +75,9 @@ function update_view(netlist_name, result, id) {
   var ld = result["netlist_details"];
   $("#no-netlist-provided-span").attr("hidden", "true");
   $("#netlist-name-" + id).html("Name: " + netlist_name);
-  $("#grid-size-" + id).html("Grid: " + ld.gridhor + " x " + ld.gridver);
-  $("#horcap-" + id).html("Horizontal Capacity: " + ld.horcap);
-  $("#vercap-" + id).html("Vertical Capacity: " + ld.vercap);
+  $("#grid-size-" + id).html("Grid: " + ld.grid_hor + " x " + ld.grid_ver);
+  $("#horcap-" + id).html("Horizontal Capacity: " + ld.hor_cap);
+  $("#vercap-" + id).html("Vertical Capacity: " + ld.ver_cap);
   $("#netlist-size-" + id).html("Netlist Size: " + ld.netlist_size);
   $("#overflow-" + id).html("Overflow: " + result.overflow);
   $("#wirelength-" + id).html("Wirelength: " + result.wirelength);
