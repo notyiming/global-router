@@ -14,7 +14,7 @@ class TestGlobalRouter(unittest.TestCase):
 
     def test_global_router_instance(self):
         """test global router class instance"""
-        self.assertIsInstance(GlobalRouter(), GlobalRouter)
+        self.assertIsInstance(GlobalRouter(1,-1), GlobalRouter)
 
 if __name__ == "__main__":
     unittest.main()
