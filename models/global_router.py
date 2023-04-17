@@ -54,7 +54,12 @@ class GlobalRouter:
     @util.timeit
     @util.log_func
     def rip_up_and_reroute(self) -> Tuple[int, int]:
-        """rip up and reroute"""
+        """rip up and reroute
+
+        Returns:
+            Tuple[int, int]: overflow and wirelength
+        """
+
         overflow_nets: List[Net] = []
         grid = self.grid
         for net in self.netlist:
@@ -296,7 +301,7 @@ class GlobalRouter:
             input_file_path (str): path of the netlist input file
 
         Returns:
-            List[Net]: list of all nets
+            Dict: dictionary of the netlist
         """
         with open(input_file_path, "r", encoding="utf-8") as file:
             grid_data = file.readline().split()
