@@ -24,13 +24,15 @@ def gr_cli():
 @click.argument("output_file")
 @click.option("-a", "--algorithm", default=1, help="1. Best First Search 2. Breadth First Search", type=int)
 @click.option("-s", "--seed", default=-1, help="Random seed", type=int)
-def global_route(input_file: str, output_file: str, algorithm: int, seed: int) -> Tuple[Dict, GlobalRouter]:
+def global_route(input_file: str, output_file: str, algorithm: int, seed: int | None) -> Tuple[Dict, GlobalRouter]:
     """Global Route a netlist file and generate a routed output
     \f
 
     Args:
         input_file (str): Path to netlist input file
         output_file (str): Path to generated output file
+        algorithm (int, optional): Routing algorithm. Defaults to 1.
+        seed (int, optional): Random seed. Defaults to None.
     """
     global_router = GlobalRouter(algorithm, seed)
     netlist_details = global_router.parse_input(input_file)
@@ -43,7 +45,15 @@ def global_route(input_file: str, output_file: str, algorithm: int, seed: int) -
         f"Number of nets: {netlist_details['netlist_size']}\n"
     )
 
-    num_threads = 5
+    if seed and seed != -1:
+        gr_logger.info(f"Seed detected: {seed}")
+        num_threads = 1
+    else:
+        num_threads = 5
+
+    if algorithm == 2:
+        num_threads = 1
+
     global_routers: list[GlobalRouter] = []
     for _ in range(num_threads):
         router_copy = copy.deepcopy(global_router)
@@ -70,6 +80,7 @@ def global_route(input_file: str, output_file: str, algorithm: int, seed: int) -
         "    Initial Routing Result    \n"
         "==============================\n"
         f"Best Router Index: {best_gr_index}\n"
+        f"Best Router Seed: {global_routers[best_gr_index].seed}\n"
         f"Best Overflow: {min_overflow}\n"
         f"Best Wirelength: {min_wirelength}\n"
         "==============================\n")
@@ -94,6 +105,7 @@ def global_route(input_file: str, output_file: str, algorithm: int, seed: int) -
         "     Final Routing Result     \n"
         "==============================\n"
         f"Best Router Index: {best_gr_index}\n"
+        f"Best Router Seed: {global_routers[best_gr_index].seed}\n"
         f"Best Overflow: {min_overflow}\n"
         f"Best Wirelength: {min_wirelength}\n"
         "==============================\n")

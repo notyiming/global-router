@@ -16,6 +16,19 @@ $(document).ready(function () {
     $("#submit-netlist").prop("disabled", true);
   });
 
+  $("#sample-netlist-select, #inputFile").change(function () {
+    $("#submit-netlist").removeAttr("disabled");
+  });
+  
+  $("#algorithm-select").change(function () {
+    var selected_algorithm = $(this).val();
+    if (selected_algorithm == 1) {
+      $("#seed-input").prop("disabled", false);
+    } else {
+      $("#seed-input").prop("disabled", true).val("");
+    }
+  });
+
   $("#netlist-input-form").on("submit", function (e) {
     e.preventDefault();
     var netlist_input_data = new FormData();
@@ -56,9 +69,6 @@ $(document).ready(function () {
     });
   });
 
-  $("#sample-netlist-select, #inputFile").change(function () {
-    $("#submit-netlist").removeAttr("disabled");
-  });
 });
 
 function ready_job_state(id, timestamp) {

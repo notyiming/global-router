@@ -138,7 +138,8 @@ def dashboard():
     if request.method == "POST":
         input_file = request.files.get("input-file", None)
         algorithm = int(request.form.get("algorithm-select"))
-        seed = int(request.form.get("seed-input"))
+        seed = request.form.get("seed-input") 
+        seed = int(seed) if seed else None
         if input_file:
             filename = secure_filename(input_file.filename)
             netlist_file = os.path.join(
@@ -169,7 +170,7 @@ def dashboard():
             "unique_name": f"{file_basename}_{unix_timenow}",
             "fig_html": gr.plot_congestion.callback(f"output/{file_basename}.out.fig"),
             "algorithm": ["Best First Search","Breadth First Search"][algorithm - 1],
-            "seed": global_router.seed
+            "seed": str(global_router.seed)
         }
 
         db.child("users").child(encoded_email).child("outputs").push(result)

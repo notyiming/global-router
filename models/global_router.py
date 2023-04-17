@@ -4,6 +4,7 @@ from collections import deque
 import heapq
 import os
 import random
+import sys
 from typing import Dict, List, Tuple
 import click
 from models.net import Net
@@ -60,8 +61,7 @@ class GlobalRouter:
             if grid.is_overflow(net.path):
                 overflow_nets.append(net)
 
-        random.shuffle(overflow_nets)
-        # overflow_nets.sort(key=lambda x: x.hpwl)
+        overflow_nets.sort(key=lambda x: x.hpwl)
         match self.algorithm:
             case 1:
                 routing_algorithm = self.connect_net_best_first_search_heapq
@@ -244,13 +244,15 @@ class GlobalRouter:
     @util.log_func
     def route(self) -> None:
         """main global routing logic"""
-        random.shuffle(self.netlist)
-        random_seed = random.getstate()[1][0]
-        self.seed = random_seed
-        self.netlist.sort(key=lambda x: x.hpwl)
-
         match self.algorithm:
             case 1:
+                if not self.seed:
+                    gr_logger.info(f"Generating God Seed...")
+                    self.seed = random.randrange(sys.maxsize)
+                gr_logger.info(f"Using God Seed: {self.seed}")
+                random.seed(self.seed)
+                random.shuffle(self.netlist)
+                self.netlist.sort(key=lambda x: x.hpwl)
                 routing_algorithm = self.connect_net_best_first_search_heapq
             case 2:
                 routing_algorithm = self.connect_net_breadth_first_search
