@@ -78,20 +78,20 @@ class TestGlobalRouter(unittest.TestCase):
 
     def test_update_overflow_wirelength_no_overflow(self):
         grid = Grid((3, 4), (2, 3))
-        grid.demand = [1] * 17
+        grid.congestion = [1] * 17
         self.global_router.grid = grid
         self.assertEqual(grid.number_of_edges, 17)
         self.global_router.update_overflow_wirelength()
         self.assertEqual(self.global_router.overflow, 0)
-        self.assertEqual(self.global_router.wirelength, sum(grid.demand))
+        self.assertEqual(self.global_router.wirelength, sum(grid.congestion))
 
     def test_update_overflow_wirelength_with_overflow(self):
         grid = Grid((3, 4), (2, 3))
-        grid.demand = [5] * 17
+        grid.congestion = [5] * 17
         self.global_router.grid = grid
         self.global_router.update_overflow_wirelength()
         self.assertEqual(self.global_router.overflow, 42)
-        self.assertEqual(self.global_router.wirelength, sum(grid.demand))
+        self.assertEqual(self.global_router.wirelength, sum(grid.congestion))
 
     def test_generate_congestion_output(self):
         self.global_router.parse_input("benchmarks/example.txt")

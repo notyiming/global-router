@@ -75,9 +75,9 @@ class GlobalRouter:
 
         with click.progressbar(overflow_nets, label="Performing Rip-up and Reroute") as nets:
             for net in nets:
-                grid.update_demand(net.path, False)  # removing the path
+                grid.update_congestion(net.path, False)  # removing the path
                 routing_algorithm(net)  # rerouting the path
-                grid.update_demand(net.path, True)  # replacing the path
+                grid.update_congestion(net.path, True)  # replacing the path
 
         self.update_overflow_wirelength()
         return self.overflow, self.wirelength
@@ -233,12 +233,12 @@ class GlobalRouter:
         overflow = 0
         grid = self.grid
         for i in range(grid.number_of_edges):
-            # get wirelength from demand list
-            total_wirelength += grid.demand[i]
+            # get wirelength from congestion list
+            total_wirelength += grid.congestion[i]
             capacity = grid.vertical_capacity
             if i < grid.number_of_horizontal_edges:
                 capacity = grid.horizontal_capacity
-            overflow = grid.demand[i] - capacity
+            overflow = grid.congestion[i] - capacity
             if overflow <= 0:
                 continue
             total_overflow += overflow
@@ -265,7 +265,7 @@ class GlobalRouter:
         with click.progressbar(self.netlist, label="Routing the netlist") as netlist:
             for net in netlist:
                 routing_algorithm(net)
-                self.grid.update_demand(net.path, True)
+                self.grid.update_congestion(net.path, True)
 
         self.update_overflow_wirelength()
         gr_logger.info(f"Total Overflow: {self.overflow}")
@@ -288,7 +288,7 @@ class GlobalRouter:
                 f"{grid.grid_horizontal_size} {grid.grid_vertical_size}\n")
             for i in range(grid.number_of_edges):
                 output.write(
-                    f"{grid.demand[i]/(grid.horizontal_capacity if i < grid.number_of_horizontal_edges else grid.vertical_capacity)} "
+                    f"{grid.congestion[i]/(grid.horizontal_capacity if i < grid.number_of_horizontal_edges else grid.vertical_capacity)} "
                 )
             gr_logger.info(
                 f"Congestion data generated into {output_file_name}.fig")

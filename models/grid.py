@@ -19,8 +19,8 @@ class Grid:
             self.grid_horizontal_size - 1) * self.grid_vertical_size
         self.number_of_edges: int = self.number_of_horizontal_edges + \
             (self.grid_vertical_size - 1) * self.grid_horizontal_size
-        # the demand of each edge (ver and hor)
-        self.demand: List[float] = [0] * self.number_of_edges
+        # the congestion of each edge (ver and hor)
+        self.congestion: List[float] = [0] * self.number_of_edges
 
     def is_overflow(self, path: Path) -> bool:
         """Determines if overflow exists for a path
@@ -32,26 +32,26 @@ class Grid:
             bool: layout has overflow
         """
         for edge_id in path.edge_id_set:
-            if self.demand[edge_id] > self.horizontal_capacity \
+            if self.congestion[edge_id] > self.horizontal_capacity \
                     if edge_id < self.number_of_horizontal_edges else self.vertical_capacity:
                 return True
         return False
 
-    def update_demand(self, path: Path, increment: bool):
-        """Update demand level for the path
+    def update_congestion(self, path: Path, increment: bool):
+        """Update congestion level for the path
 
         Args:
             path (Path): path
-            increment (bool): demand is incremented, else decremented
+            increment (bool): congestion is incremented, else decremented
         """
         for edge_id in path.edge_id_set:
             if increment:  # place wire
-                self.demand[edge_id] += 1
+                self.congestion[edge_id] += 1
             else:  # remove wire
-                self.demand[edge_id] -= 1
+                self.congestion[edge_id] -= 1
 
     def get_edge_cost(self, edge_id: int) -> float:
-        """Get the cost of the edge. This cost function ensures that edges with high demand
+        """Get the cost of the edge. This cost function ensures that edges with high congestion
         have higher costs, which guides the search algorithm towards less congested paths
         and helps find a solution more quickly.
 
@@ -62,9 +62,9 @@ class Grid:
             float: cost of the edge
         """
         capacity = self.horizontal_capacity if edge_id < self.number_of_horizontal_edges else self.vertical_capacity
-        if self.demand[edge_id] >= capacity:  # if the edge is overflown
+        if self.congestion[edge_id] >= capacity:  # if the edge is overflown
             return 10000
-        return 1 + (self.demand[edge_id] + 1) / capacity
+        return 1 + (self.congestion[edge_id] + 1) / capacity
 
     def get_edge_id(self, coordinate: Tuple[int, int], direction: int) -> int:
         """Get ID of the edge

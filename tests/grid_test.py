@@ -22,7 +22,7 @@ class TestGrid(unittest.TestCase):
         self.assertEqual(grid.number_of_nodes, 12)
         self.assertEqual(grid.number_of_horizontal_edges, 8)
         self.assertEqual(grid.number_of_edges, 17)
-        self.assertEqual(grid.demand, [0] * 17)
+        self.assertEqual(grid.congestion, [0] * 17)
 
     def test_coordinate_is_legal(self):
         grid_size = (3, 4)
@@ -51,7 +51,7 @@ class TestGrid(unittest.TestCase):
         grid_size = (5, 5)
         capacity = (2, 2)
         grid = Grid(grid_size, capacity)
-        grid.demand[0] = 2
+        grid.congestion[0] = 2
         self.assertEqual(grid.get_edge_cost(0), 10000)
         self.assertEqual(grid.get_edge_cost(1), 1.5)
 
