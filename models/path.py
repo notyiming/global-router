@@ -8,7 +8,7 @@ from models.node import Node
 class Path:
     """Path class represents the full path of a net"""
 
-    def __init__(self, end_node) -> None:
+    def __init__(self, end_node: Node) -> None:
         self.coordinates_list: Deque[Tuple[int, int]] = deque()
         self.end_node: Node = end_node
         self.edge_id_set: Set[int] = set()

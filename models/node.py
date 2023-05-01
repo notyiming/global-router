@@ -3,7 +3,7 @@ from typing import Tuple
 
 class Node:
     """Node class represents a pin in a net"""
-    def __init__(self, prev, coordinates):
+    def __init__(self, prev: "Node", coordinates: Tuple[int, int]):
         self.edge_id = -1
         self.node_id = -1
         self.prev: Node = prev
