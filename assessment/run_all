@@ -1,11 +1,11 @@
 #!/bin/bash
 
-testcasePool="ibm01 ibm02 ibm03 ibm04"
+benchmarksPool="ibm01 ibm02 ibm03 ibm04"
 timeLimit=1000
 
 root=$( pwd )
 outputDir=$root/output
-testcaseDir=$root/testcase
+benchmarksDir=$root/benchmarks
 verifyBin=$root/assessment/verify
 chmod 744 $verifyBin
 
@@ -16,7 +16,7 @@ function timeout()
 
 function executionCmd () 
 {
-	local argv="$testcaseDir/$1.modified.txt $outputDir/$1.modified.out"
+	local argv="$benchmarksDir/$1.modified.txt $outputDir/$1.modified.out"
 	local log=$( ( time -p timeout $timeLimit ./gr global-route $argv ) 2>&1 > /dev/null )
 	if [[ $log =~ "perl -e" ]]; then
 		echo "TLE"
@@ -27,7 +27,7 @@ function executionCmd ()
 
 function verifyCmd ()
 {
-	local argv="$testcaseDir/$1.modified.txt $outputDir/$1.modified.out"
+	local argv="$benchmarksDir/$1.modified.txt $outputDir/$1.modified.out"
 	local log=$( $verifyBin $argv | cat )
 	if [[ $log =~ "# RESULT #" ]]; then
 		if [[ $log =~ "# of unconnected net because of pin: 0" ]]; then
@@ -60,15 +60,15 @@ echo "|---------------------------------------------------------|"
 
 
 rm -rf $outputDir/*
-printf "%10s | %10s | %10s | %10s | %s\n" testcase overflow wirelength runtime status
-for testcase in $testcasePool; do
-    printf "%10s | " $testcase
+printf "%10s | %10s | %10s | %10s | %s\n" benchmarks overflow wirelength runtime status
+for benchmarks in $benchmarksPool; do
+    printf "%10s | " $benchmarks
 
-    runtime=$( executionCmd $testcase )
+    runtime=$( executionCmd $benchmarks )
     overflow=fail
     wirelength=fail
     if [[ $runtime != "TLE" ]]; then
-        status=$( verifyCmd $testcase )
+        status=$( verifyCmd $benchmarks )
 
         if [[ $status =~ "success" ]]; then
             overflow=$( echo "$status" | cut -d ' ' -f 2 )
@@ -78,7 +78,7 @@ for testcase in $testcasePool; do
             statusList="$statusList $status"
         fi
     else
-        status="$testcase failed."
+        status="$benchmarks failed."
         statusList="$statusList $status"
     fi
 

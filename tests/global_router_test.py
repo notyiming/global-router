@@ -24,7 +24,7 @@ class TestGlobalRouter(unittest.TestCase):
 
     def test_dump_result(self):
         # Test that dump_result writes the correct output file
-        self.global_router.parse_input("testcase/example.txt")
+        self.global_router.parse_input("benchmarks/example.txt")
         self.global_router.route()
         expected_output = "net0 0\n(0, 1, 1)-(1, 1, 1)\n!\nnet1 1\n(0, 2, 1)-(1, 2, 1)\n(1, 2, 1)-(1, 1, 1)\n!\nnet2 2\n(2, 2, 1)-(2, 1, 1)\n(2, 1, 1)-(2, 0, 1)\n(2, 0, 1)-(1, 0, 1)\n!\n"
         output_file_path = "test_output.txt"
@@ -36,7 +36,7 @@ class TestGlobalRouter(unittest.TestCase):
 
     def test_parse_input(self):
         global_router = GlobalRouter((3, 4), (2, 2))
-        netlist_details = global_router.parse_input("testcase/example.txt")
+        netlist_details = global_router.parse_input("benchmarks/example.txt")
         self.assertEqual(netlist_details['grid_hor'], 3)
         self.assertEqual(netlist_details['grid_ver'], 3)
         self.assertEqual(netlist_details['ver_cap'], 2)
@@ -94,7 +94,7 @@ class TestGlobalRouter(unittest.TestCase):
         self.assertEqual(self.global_router.wirelength, sum(grid.demand))
 
     def test_generate_congestion_output(self):
-        self.global_router.parse_input("testcase/example.txt")
+        self.global_router.parse_input("benchmarks/example.txt")
         self.global_router.route()
         output_file_path = "test_output.txt"
         figure_file_path = "test_output.txt.fig"

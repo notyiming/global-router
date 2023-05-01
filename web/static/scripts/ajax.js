@@ -45,7 +45,7 @@ $(document).ready(function () {
         "ibm03.modified",
         "ibm04.modified",
       ][selected_netlist - 1];
-      netlist_path = "testcase/" + netlist_name + ".txt";
+      netlist_path = "benchmarks/" + netlist_name + ".txt";
       netlist_input_data.append("sample-netlist-select", netlist_path);
     }
 
