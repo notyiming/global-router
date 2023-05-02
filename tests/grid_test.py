@@ -24,15 +24,15 @@ class TestGrid(unittest.TestCase):
         self.assertEqual(grid.number_of_edges, 17)
         self.assertEqual(grid.congestion, [0] * 17)
 
-    def test_coordinate_is_legal(self):
+    def test_coordinate_is_in_bound(self):
         grid_size = (3, 4)
         capacity = (2, 3)
         grid = Grid(grid_size, capacity)
-        self.assertTrue(grid.coordinate_is_legal((0, 0)))
-        self.assertTrue(grid.coordinate_is_legal((2, 3)))
-        self.assertFalse(grid.coordinate_is_legal((-1, 0)))
-        self.assertFalse(grid.coordinate_is_legal((0, 4)))
-        self.assertFalse(grid.coordinate_is_legal((3, 3)))
+        self.assertTrue(grid.coordinate_is_in_bound((0, 0)))
+        self.assertTrue(grid.coordinate_is_in_bound((2, 3)))
+        self.assertFalse(grid.coordinate_is_in_bound((-1, 0)))
+        self.assertFalse(grid.coordinate_is_in_bound((0, 4)))
+        self.assertFalse(grid.coordinate_is_in_bound((3, 3)))
 
     def test_get_node_id(self):
         grid_size = (3, 4)

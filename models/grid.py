@@ -99,7 +99,7 @@ class Grid:
         """
         return self.grid_horizontal_size * coordinate[1] + coordinate[0]
 
-    def coordinate_is_legal(self, next_coordinate: Tuple[int, int]) -> bool:
+    def coordinate_is_in_bound(self, next_coordinate: Tuple[int, int]) -> bool:
         """Determine if given coordinate is within layout bounds
 
         Args:
