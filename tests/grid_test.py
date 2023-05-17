@@ -4,8 +4,6 @@
 import unittest
 
 from models.grid import Grid
-from models.node import Node
-from models.path import Path
 
 
 class TestGrid(unittest.TestCase):
