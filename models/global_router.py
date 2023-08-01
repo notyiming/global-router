@@ -221,8 +221,13 @@ class GlobalRouter:
                     current_node.coordinates, i)
 
                 # set cost
-                next_node.cost = current_node.cost + \
+                congestion = current_node.cost + \
                     grid.get_edge_cost(next_node.edge_id)
+                    
+                distance = 0
+                
+                next_node.cost = (congestion, distance)
+
 
                 heapq.heappush(priority_queue, next_node)
 
