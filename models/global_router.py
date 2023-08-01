@@ -220,12 +220,13 @@ class GlobalRouter:
                 next_node.edge_id = grid.get_edge_id(
                     current_node.coordinates, i)
 
-                # set cost
+                # get congestion and distance
                 congestion = current_node.cost + \
                     grid.get_edge_cost(next_node.edge_id)
                     
-                distance = 0
+                distance = grid.get_distance(next_node.coordinates, end_pin)
                 
+                # set cost
                 next_node.cost = (congestion, distance)
 
 
