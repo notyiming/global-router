@@ -110,3 +110,15 @@ class Grid:
         """
         x, y = next_coordinate
         return 0 <= x < self.grid_horizontal_size and 0 <= y < self.grid_vertical_size
+    
+    def get_distance(self, coordinate1: Tuple[int, int], coordinate2: Tuple[int, int]) -> int:
+        """Get the Manhattan distance between two coordinates
+
+        Args:
+            coordinate1 (Tuple[int, int]): coordinate of node 1
+            coordinate2 (Tuple[int, int]): coordinate of node 2
+
+        Returns:
+            int: Manhattan distance between two coordinates
+        """
+        return abs(coordinate1[0] - coordinate2[0]) + abs(coordinate1[1] - coordinate2[1])
