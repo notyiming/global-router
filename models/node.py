@@ -8,7 +8,7 @@ class Node:
         self.node_id = -1
         self.prev: Node = prev
         self.coordinates: Tuple[int, int] = coordinates
-        self.cost = 0.0
+        self.cost = (0.0, 0.0)
 
     def __lt__(self, other):
         return self.cost < other.cost
