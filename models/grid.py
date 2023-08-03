@@ -64,7 +64,7 @@ class Grid:
         capacity = self.horizontal_capacity if edge_id < self.number_of_horizontal_edges else self.vertical_capacity
         if self.congestion[edge_id] >= capacity:  # if the edge is overflown
             return 10000
-        return 1 + (self.congestion[edge_id] + 1) / capacity
+        return (self.congestion[edge_id] + 1) / capacity
 
     def get_edge_id(self, coordinate: Tuple[int, int], direction: int) -> int:
         """Get ID of the edge

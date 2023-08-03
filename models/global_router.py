@@ -227,7 +227,7 @@ class GlobalRouter:
                 distance = grid.get_distance(next_node.coordinates, end_pin)
                 
                 # set cost
-                next_node.cost = (congestion, distance)
+                next_node.cost = (congestion, distance, current_node.cost[2] + 1)
 
 
                 heapq.heappush(priority_queue, next_node)
