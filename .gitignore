@@ -9,3 +9,5 @@ __pycache__/
 congestion_plots/
 web/static/*.png
 uploaded_netlists/
+venv/
+benchmarks/

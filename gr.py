@@ -5,7 +5,7 @@ import copy
 import math
 import multiprocessing
 from typing import Dict, Tuple
-import click
+import rich_click as click
 from matplotlib import patches, pyplot as plt
 import numpy as np
 import mpld3
