@@ -48,7 +48,7 @@ class GlobalRouter:
                     output.write(
                         f"({coordinates[i+1][0]}, {coordinates[i+1][1]}, 1)\n")
                 output.write("!\n")
-            gr_logger.info(
+            gr_logger.debug(
                 f"Output successfully dumped into {output_file_path}")
 
     @util.timeit
@@ -247,14 +247,14 @@ class GlobalRouter:
 
     @util.timeit
     @util.log_func
-    def route(self) -> None:
+    def route(self, live=None) -> None:
         """main global routing logic"""
         match self.algorithm:
             case 1:
                 if not self.seed:
-                    gr_logger.info(f"Generating God Seed...")
+                    gr_logger.debug(f"Generating God Seed...")
                     self.seed = random.randrange(sys.maxsize)
-                gr_logger.info(f"Using God Seed: {self.seed}")
+                gr_logger.debug(f"Using God Seed: {self.seed}")
                 random.seed(self.seed)
                 random.shuffle(self.netlist)
                 self.netlist.sort(key=lambda x: x.hpwl)
@@ -262,14 +262,14 @@ class GlobalRouter:
             case 2:
                 routing_algorithm = self.connect_net_breadth_first_search
 
-        with click.progressbar(self.netlist, label="Routing the netlist") as netlist:
-            for net in netlist:
-                routing_algorithm(net)
-                self.grid.update_congestion(net.path, True)
+        # with click.progressbar(self.netlist, label="Routing the netlist") as netlist:
+        for net in self.netlist:
+            routing_algorithm(net)
+            self.grid.update_congestion(net.path, True)
 
         self.update_overflow_wirelength()
-        gr_logger.info(f"Total Overflow: {self.overflow}")
-        gr_logger.info(f"Total Wirelength: {self.wirelength}")
+        gr_logger.debug(f"Total Overflow: {self.overflow}")
+        gr_logger.debug(f"Total Wirelength: {self.wirelength}")
         self.netlist.sort(key=lambda x: x.net_id)
 
     def generate_congestion_output(self, output_file_name: str) -> None:
@@ -290,7 +290,7 @@ class GlobalRouter:
                 output.write(
                     f"{grid.congestion[i]/(grid.horizontal_capacity if i < grid.number_of_horizontal_edges else grid.vertical_capacity)} "
                 )
-            gr_logger.info(
+            gr_logger.debug(
                 f"Congestion data generated into {output_file_name}.fig")
 
     @util.log_func
@@ -325,7 +325,7 @@ class GlobalRouter:
                     net_pins.append((net_pin_x, net_pin_y))
                 net = Net(net_id, net_name, num_of_pins, net_pins)
                 self.netlist.append(net)
-            gr_logger.info(
+            gr_logger.debug(
                 f"{input_file_path} parsed successfully, data structures created")
             netlist_details = {
                 "grid_hor": grid_horizontal_size,
