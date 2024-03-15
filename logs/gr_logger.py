@@ -1,5 +1,5 @@
-"""Custom Logger for Global Router"""
-import logging
+"""Custom Logger for Global Router."""
+
 import logging.handlers
 import os
 
@@ -11,10 +11,7 @@ gr_logger = logging.getLogger("gr")
 log_formatter = logging.Formatter("%(asctime)s [%(levelname)s]: %(message)s")
 
 file_handler = logging.handlers.RotatingFileHandler(
-    LOG_FILENAME,
-    mode="w",
-    backupCount=5,
-    delay=True
+    LOG_FILENAME, mode="w", backupCount=5, delay=True
 )
 if should_roll_over:
     file_handler.doRollover()

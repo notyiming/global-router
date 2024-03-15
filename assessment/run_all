@@ -14,7 +14,7 @@ function timeout()
 	perl -e 'alarm shift; exec @ARGV' "$@";
 }
 
-function executionCmd () 
+function executionCmd ()
 {
 	local argv="$benchmarksDir/$1.modified.txt $outputDir/$1.modified.out"
 	local log=$( ( time -p timeout $timeLimit ./gr global-route $argv ) 2>&1 > /dev/null )

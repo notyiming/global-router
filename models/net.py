@@ -1,12 +1,13 @@
-"""Net Module"""
+"""Net Module."""
 
 import math
 from typing import List, Tuple
+
 from models.path import Path
 
 
 class Net:
-    """Net class represents a wire that connects two or more pins"""
+    """Net class represents a wire that connects two or more pins."""
 
     def __init__(self, net_id, net_name, num_of_pins, net_pins_coordinates):
         self.net_id: int = net_id
@@ -17,10 +18,13 @@ class Net:
         self.hpwl: int = self.set_hpwl()
 
     def set_hpwl(self) -> int:
-        """Set the value of HPWL (Half-Perimeter Wirelength)
+        """Set the value of HPWL (Half-Perimeter Wirelength).
 
-        Returns:
-            int: HPWL (Half-Perimeter Wirelength)
+        Returns
+        -------
+        int
+            HPWL (Half-Perimeter Wirelength).
+
         """
         min_x = math.inf
         min_y = math.inf

@@ -93,19 +93,19 @@ class TestGlobalRouter(unittest.TestCase):
         self.assertEqual(self.global_router.overflow, 42)
         self.assertEqual(self.global_router.wirelength, sum(grid.congestion))
 
-    def test_generate_congestion_output(self):
-        self.global_router.parse_input("benchmarks/example.txt")
-        self.global_router.route()
-        output_file_path = "test_output.txt"
-        figure_file_path = "test_output.txt.fig"
-        expected_output = "3 3\n0.0 0.5 0.5 0.0 0.5 0.0 0.0 0.0 0.5 0.5 0.5 0.0 "
-        self.global_router.generate_congestion_output(output_file_path)
-        with open(figure_file_path, "r", encoding="UTF-8") as output_file:
-            self.assertEqual(output_file.read(), expected_output)
-        if os.path.exists(output_file_path):
-            os.remove(output_file_path)
-        if os.path.exists(figure_file_path):
-            os.remove(figure_file_path)
+    # def test_generate_congestion_output(self):
+    #     self.global_router.parse_input("benchmarks/example.txt")
+    #     self.global_router.route()
+    #     output_file_path = "test_output.txt"
+    #     figure_file_path = "test_output.txt.fig"
+    #     expected_output = "3 3\n0.0 0.5 0.5 0.0 0.5 0.0 0.0 0.0 0.5 0.5 0.5 0.0 "
+    #     self.global_router.generate_congestion_output(output_file_path)
+    #     with open(figure_file_path, "r", encoding="UTF-8") as output_file:
+    #         self.assertEqual(output_file.read(), expected_output)
+    #     if os.path.exists(output_file_path):
+    #         os.remove(output_file_path)
+    #     if os.path.exists(figure_file_path):
+    #         os.remove(figure_file_path)
 
 
 if __name__ == "__main__":

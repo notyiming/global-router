@@ -11,3 +11,4 @@ web/static/*.png
 uploaded_netlists/
 venv/
 benchmarks/
+.coverage

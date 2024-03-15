@@ -1,9 +1,0 @@
-rich-click
-Flask
-pycryptodome
-Pyrebase4
-python-dotenv
-requests
-mpld3
-fibheap
-rich

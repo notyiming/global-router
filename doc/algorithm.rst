@@ -35,12 +35,12 @@ and detail of the algorithm will be provided.
 
 Firstly, upon receiving the netlist input, the global routing algorithm parses the supplied
 netlist file. Subsequently, it proceeds to construct and initialize essential data structures,
-including the grid data structure, which encompasses the grid size, horizontal and vertical 
+including the grid data structure, which encompasses the grid size, horizontal and vertical
 capacities of the grid, among other attributes. In addition, the list of net data
 structures is established, comprising the net ID, net name, and coordinates of the two
 pins to be connected, among other relevant features.
 
-Next, we aim to create an initial solution by routing a path for each net in the netlist, 
+Next, we aim to create an initial solution by routing a path for each net in the netlist,
 connecting the two pins of each net in the netlist sequentially. This will be the constructive
 algorithm part in the heuristic algorithm structure. The sequence of routing the nets
 is critical, as the output results in different wirelength and overflow values. Nonetheless,

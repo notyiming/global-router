@@ -1,14 +1,19 @@
-"""Utils Module"""
+"""Utils Module."""
 
 from functools import wraps
 from time import time
+
 from logs.gr_logger import gr_logger
 
-def timeit(func):
-    """Decorator to time function run time
 
-    Args:
-        func (Callable): function to time
+def timeit(func):
+    """Wrap function to time execution.
+
+    Attributes
+    ----------
+    func: Callable
+        Function to time.
+
     """
 
     @wraps(func)
@@ -21,12 +26,17 @@ def timeit(func):
 
     return wrap_func
 
-def log_func(func):
-    """Decorator to log the function with args
 
-    Args:
-        func (Callable): function to log
+def log_func(func):
+    """Wrap function to log.
+
+    Attributes
+    ----------
+    func: Callable
+        Function to log.
+
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
@@ -34,5 +44,5 @@ def log_func(func):
             return func(*args, **kwargs)
         except Exception as ex:
             gr_logger.exception(ex)
-    # wrapper.__doc__ = func.__doc__
+
     return wrapper

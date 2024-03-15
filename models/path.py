@@ -1,12 +1,13 @@
-"""Path Module"""
+"""Path Module."""
 
 from collections import deque
-from typing import Tuple, Deque, Set
+from typing import Deque, Set, Tuple
+
 from models.node import Node
 
 
 class Path:
-    """Path class represents the full path of a net"""
+    """Path class represents the full path of a net."""
 
     def __init__(self, end_node: Node) -> None:
         self.coordinates_list: Deque[Tuple[int, int]] = deque()

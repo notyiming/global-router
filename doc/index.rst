@@ -7,9 +7,9 @@ Welcome to Global Router's documentation!
 =========================================
 
 
-This Global Router project is a VLSI (Very Large Scale Integration) global router that 
-has been implemented using Python. The goal of the project is to solve the global routing 
-problem, which is known to be NP-hard. 
+This Global Router project is a VLSI (Very Large Scale Integration) global router that
+has been implemented using Python. The goal of the project is to solve the global routing
+problem, which is known to be NP-hard.
 
 Global Routing in VLSI is an NP-hard problem. This means that finding an optimal solution
 for the problem may require exponential time, and it is not possible to guarantee finding

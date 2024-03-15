@@ -8,7 +8,7 @@ Overall Architecture Breakdown
 
 As illustrated in the architecture diagram above, the system architecture is characterized by a
 straightforward design. Specifically, the web application backend operates on a Python
-Flask server. The Flask server serves as the primary mechanism for handling global 
+Flask server. The Flask server serves as the primary mechanism for handling global
 routing logic and flow. Additionally, the Flask server facilitates the rendering of HTML
 pages through the Jinja templating system. Consequently, the end-user can interact with
 the web application and provide the netlist input. Once the netlist input is received,
